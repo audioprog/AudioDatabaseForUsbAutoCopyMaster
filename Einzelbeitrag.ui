@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Einzelbeitrag</class>
+ <widget class="QWidget" name="Einzelbeitrag">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>621</width>
+    <height>215</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="2" column="2">
+      <widget class="QLabel" name="beitragsartLabel">
+       <property name="text">
+        <string>Beitragsart</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="titelnummerLabel">
+       <property name="text">
+        <string>Titelnummer</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="3">
+      <widget class="CompletedLineEdit" name="beitragsartLineEdit"/>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="themaLabel">
+       <property name="text">
+        <string>Thema</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="nameLabel">
+       <property name="text">
+        <string>Name</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="CompletedLineEdit" name="nameLineEdit"/>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="bibelstelleLabel">
+       <property name="text">
+        <string>Bibelstelle</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1" colspan="3">
+      <widget class="CompletedLineEdit" name="themaLineEdit"/>
+     </item>
+     <item row="4" column="1" colspan="3">
+      <widget class="CompletedLineEdit" name="bibelstelleLineEdit"/>
+     </item>
+     <item row="0" column="3">
+      <widget class="QComboBox" name="comboBoxFileName"/>
+     </item>
+     <item row="0" column="2">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Datei</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="QSpinBox" name="titelnummerSpinBox">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelTime">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QLabel" name="labelLocal">
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>30</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background: red</string>
+       </property>
+       <property name="text">
+        <string>Aufnahme</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="labelMp3">
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>30</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background: red</string>
+       </property>
+       <property name="text">
+        <string>Lokal</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="labelServer">
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>30</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background: red;</string>
+       </property>
+       <property name="text">
+        <string>Server</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QToolButton" name="toolButtonMp3">
+       <property name="text">
+        <string>MP3</string>
+       </property>
+       <property name="icon">
+        <iconset resource="res.qrc">
+         <normaloff>:/icons/Icons/ok.png</normaloff>:/icons/Icons/ok.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QProgressBar" name="progressBar">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>32</height>
+        </size>
+       </property>
+       <property name="value">
+        <number>0</number>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="toolButtonStartPlay">
+       <property name="text">
+        <string>&gt;</string>
+       </property>
+       <property name="icon">
+        <iconset resource="res.qrc">
+         <normaloff>:/icons/Icons/play.png</normaloff>:/icons/Icons/play.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="toolButtonRemoveThis">
+       <property name="text">
+        <string> -</string>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>:/qt-project.org/styles/commonstyle/images/trash-32.png</normaloff>:/qt-project.org/styles/commonstyle/images/trash-32.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="toolButtonAnnNext">
+       <property name="text">
+        <string>+</string>
+       </property>
+       <property name="icon">
+        <iconset resource="res.qrc">
+         <normaloff>:/icons/Icons/addAbove.png</normaloff>:/icons/Icons/addAbove.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="toolButtonSetId3Tag">
+       <property name="text">
+        <string>ID3</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QToolButton" name="toolButtonReread">
+         <property name="text">
+          <string>Neu ermitteln</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QToolButton" name="buttonSync">
+         <property name="text">
+          <string>Sync</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QToolButton" name="toolButtonRename">
+         <property name="text">
+          <string>Umbenennen</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QWidget" name="widget" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>1</height>
+      </size>
+     </property>
+     <property name="autoFillBackground">
+      <bool>false</bool>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background: black</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+  <action name="actionCheckNew">
+   <property name="text">
+    <string>Neu ermitteln</string>
+   </property>
+  </action>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>CompletedLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>CompletedLineEdit.h</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>nameLineEdit</tabstop>
+  <tabstop>beitragsartLineEdit</tabstop>
+  <tabstop>themaLineEdit</tabstop>
+  <tabstop>bibelstelleLineEdit</tabstop>
+ </tabstops>
+ <resources>
+  <include location="res.qrc"/>
+ </resources>
+ <connections/>
+</ui>
