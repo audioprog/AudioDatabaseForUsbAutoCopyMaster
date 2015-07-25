@@ -148,7 +148,9 @@ SOURCES += main.cpp\
 	taglib/wavpack/wavpackfile.cpp \
 	taglib/wavpack/wavpackproperties.cpp \
 	taglib/xm/xmfile.cpp \
-	taglib/xm/xmproperties.cpp
+	taglib/xm/xmproperties.cpp \
+    lsOutputSource.cpp \
+    lsVariantList2D.cpp
 
 HEADERS  += mainwindow.h \
     Einzelbeitrag.h \
@@ -266,7 +268,9 @@ HEADERS  += mainwindow.h \
 	taglib/wavpack/wavpackproperties.h \
 	taglib/xm/xmfile.h \
 	taglib/xm/xmproperties.h \
-	taglib/taglib_config.h
+	taglib/taglib_config.h \
+    lsOutputSource.h \
+    lsVariantList2D.h
 
 FORMS    += mainwindow.ui \
     Einzelbeitrag.ui \
