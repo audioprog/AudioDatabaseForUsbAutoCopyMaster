@@ -150,7 +150,8 @@ SOURCES += main.cpp\
 	taglib/xm/xmfile.cpp \
 	taglib/xm/xmproperties.cpp \
     lsOutputSource.cpp \
-    lsVariantList2D.cpp
+    lsVariantList2D.cpp \
+    lsTextEdit.cpp
 
 HEADERS  += mainwindow.h \
     Einzelbeitrag.h \
@@ -270,7 +271,8 @@ HEADERS  += mainwindow.h \
 	taglib/xm/xmproperties.h \
 	taglib/taglib_config.h \
     lsOutputSource.h \
-    lsVariantList2D.h
+    lsVariantList2D.h \
+    lsTextEdit.h
 
 FORMS    += mainwindow.ui \
     Einzelbeitrag.ui \
@@ -281,3 +283,4 @@ FORMS    += mainwindow.ui \
 
 RESOURCES += \
     res.qrc
+
