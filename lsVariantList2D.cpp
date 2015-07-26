@@ -1,8 +1,34 @@
 #include "lsVariantList2D.h"
 
+class lsVariantList2DPrivate: public QSharedData
+{
+public:
+	lsVariantList2DPrivate(const QStringList& columns)
+		: columnNames(columns)
+		, columnCountInt(columns.count())
+	{}
+
+	QVariant none;
+
+	QStringList columnNames;
+
+	int columnCountInt;
+
+	QVariantList data;
+
+	int dataCount;
+};
+
+lsVariantList2D::lsVariantList2D()
+	: d(new lsVariantList2DPrivate(QStringList()))
+{}
+
 lsVariantList2D::lsVariantList2D(const QStringList& columns)
-	: columnNames(columns)
-	, columnCountInt(columns.count())
+	: d(new lsVariantList2DPrivate(columns))
+{}
+
+lsVariantList2D::lsVariantList2D(const lsVariantList2D& other)
+	: d(other.d)
 {
 }
 
@@ -10,16 +36,31 @@ lsVariantList2D::~lsVariantList2D()
 {
 }
 
+const QStringList&lsVariantList2D::columns() const
+{
+	return d->columnNames;
+}
+
+const int lsVariantList2D::columnCount() const
+{
+	return d->columnCountInt;
+}
+
+int lsVariantList2D::rowCount() const
+{
+	return d->dataCount / d->columnCountInt + 1;
+}
+
 const QVariant& lsVariantList2D::cell(const QString& column, int row) const
 {
-	int columnIndex = this->columnNames.indexOf(column);
+	int columnIndex = d->columnNames.indexOf(column);
 	if (columnIndex == -1)
 	{
-		return this->none;
+		return d->none;
 	}
 	if (row < 0)
 	{
-		return this->none;
+		return d->none;
 	}
 
 	return this->cell(columnIndex, row);
@@ -27,37 +68,37 @@ const QVariant& lsVariantList2D::cell(const QString& column, int row) const
 
 const QVariant& lsVariantList2D::cell(int column, int row) const
 {
-	if (column < 0 || column >= this->columnCountInt)
+	if (column < 0 || column >= d->columnCountInt)
 	{
-		return this->none;
+		return d->none;
 	}
 	if (row < 0)
 	{
-		return this->none;
+		return d->none;
 	}
-	int maxRowCount = this->dataCount / this->columnCountInt;
+	int maxRowCount = d->dataCount / d->columnCountInt;
 	if (row > maxRowCount)
 	{
 		if (row == maxRowCount)
 		{
-			int lastRowColumnCount = this->dataCount - maxRowCount * this->columnCountInt;
+			int lastRowColumnCount = d->dataCount - maxRowCount * d->columnCountInt;
 			if (column >= lastRowColumnCount)
 			{
-				return this->none;
+				return d->none;
 			}
 		}
 		else
 		{
-			return this->none;
+			return d->none;
 		}
 	}
 
-	return this->data.value(column + row * this->columnCountInt);
+	return d->data[column + row * d->columnCountInt];
 }
 
 bool lsVariantList2D::setCell(const QString& column, int row, const QVariant& newCellData)
 {
-	int columnIndex = this->columnNames.indexOf(column);
+	int columnIndex = d->columnNames.indexOf(column);
 	if (columnIndex == -1)
 	{
 		return false;
@@ -72,7 +113,7 @@ bool lsVariantList2D::setCell(const QString& column, int row, const QVariant& ne
 
 bool lsVariantList2D::setCell(int column, int row, const QVariant& newCellData)
 {
-	if (column < 0 || column >= this->columnCountInt)
+	if (column < 0 || column >= d->columnCountInt)
 	{
 		return false;
 	}
@@ -81,22 +122,22 @@ bool lsVariantList2D::setCell(int column, int row, const QVariant& newCellData)
 		return false;
 	}
 
-	int writeIndex = column + row * this->columnCountInt;
+	int writeIndex = column + row * d->columnCountInt;
 
-	while (this->dataCount < writeIndex)
+	while (d->dataCount < writeIndex)
 	{
-		this->data.append(QVariant());
-		this->dataCount++;
+		d->data.append(QVariant());
+		d->dataCount++;
 	}
 
-	if (writeIndex < this->dataCount)
+	if (writeIndex < d->dataCount)
 	{
-		this->data[writeIndex] = newCellData;
+		d->data[writeIndex] = newCellData;
 	}
 	else
 	{
-		this->data.append(newCellData);
-		this->dataCount = this->data.count();
+		d->data.append(newCellData);
+		d->dataCount = d->data.count();
 	}
 
 	return true;
