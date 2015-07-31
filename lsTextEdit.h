@@ -25,20 +25,67 @@
 
 #include <QObject>
 
+class QContextMenuEvent;
+class QKeyEvent;
 class QPainter;
+
+struct STextSection
+{
+	STextSection() : isMeasured(false) {}
+
+	QColor color;
+
+	QFont font;
+
+	bool isMeasured;
+
+	QSizeF minSize;
+
+	QPointF pos;
+
+	QSizeF size;
+
+	QVariant sourceId;
+
+	QString text;
+};
+
+class lsTextParagraph
+{
+	friend class lsTextEdit;
+
+public:
+	lsTextParagraph() : alignment(Qt::AlignLeft) {}
+
+	bool isMeasured() const { return isMeasured; }
+
+	inline void setMeasureDirty() { for (int i = 0; i < sections.count(); i++) { sections[i].isMeasured = false; } isMeasured = false; }
+
+	Qt::Alignment alignment;
+
+	QList<STextSection> sections;
+
+private:
+	bool isMeasured;
+};
 
 class lsTextEdit : public QObject
 {
     Q_OBJECT
+
 public:
     explicit lsTextEdit(QObject *parent = 0);
     ~lsTextEdit();
 
+	bool isVisible() const { return this->m_isVisible; }
+
 	void paint( QPainter* painter );
 
-	void setVisible(bool visible);
+	void setVisible( bool visible ) {
+		this->m_isVisible = visible;
+	}
 
-	QSize sizeHint() const;
+	QRectF usedArea() const { return this->m_usedArea; }
 
 protected:
 	void mousePressEvent( const QPoint& pos );
@@ -52,33 +99,20 @@ protected:
 	void contextMenuEvent(QContextMenuEvent*);
 
 private:
+
 	int cursorPos;
 
-	struct STextSection
-	{
-		QFont font;
+	bool m_isVisible;
 
-		QColor color;
+	bool m_isRegionDirty;
 
-		QString text;
+	QRectF m_usedArea;
 
-		QRectF rect;
-
-		QRectF minRect;
-
-		QVariant sourceId;
-	};
-
-	struct STextParagraph
-	{
-		Qt::Alignment alignment;
-
-		QList<STextSection> sections;
-	};
-
-	QList<STextParagraph> paragraphs;
+	QList<lsTextParagraph> paragraphs;
 
 	QRectF rect;
+
+	QRegion region;
 };
 
 #endif // LSTEXTEDIT_H

@@ -25,7 +25,10 @@
 
 #include <QPainter>
 
-lsTextEdit::lsTextEdit(QObject *parent) : QObject(parent)
+lsTextEdit::lsTextEdit(QObject *parent)
+	: QObject(parent)
+	, m_isRegionDirty(true)
+	, m_isVisible(true)
 {
 }
 
@@ -38,18 +41,41 @@ void lsTextEdit::paint(QPainter* painter)
 	int countParagraphs = this->paragraphs;
 	for (int iParagraph = 0; iParagraph < countParagraphs; iParagraph++)
 	{
-		STextParagraph& paragraph = this->paragraphs[iParagraph];
+		lsTextParagraph& paragraph = this->paragraphs[iParagraph];
 
 		int countSections = paragraph.sections.count();
 
-		for (int iSection = 0; iSection < countSections; iSection++)
+		if ( ! paragraph.isMeasured())
 		{
-			STextSection& section = paragraph.sections[iSection];
+			for (int iSection = 0; iSection < countSections; iSection++)
+			{
+				STextSection& section = paragraph.sections[iSection];
 
-			painter->setFont(section.font);
+				if ( ! section.isMeasured)
+				{
+					section.isMeasured = true;
 
-			section.rect = painter->boundingRect(this->rect, Qt::TextSingleLine, section.text);
-			section.minRect = painter->boundingRect(this->rect, Qt::TextSingleLine, section.text.trimmed());
+					painter->setFont(section.font);
+
+					section.size = painter->boundingRect(this->rect, Qt::TextSingleLine, section.text);
+					section.minSize = painter->boundingRect(this->rect, Qt::TextSingleLine, section.text.trimmed());
+				}
+			}
+
+			paragraph.isMeasured = true;
+		}
+
+
+		QPointF startPoint;
+		if (this->m_isRegionDirty)
+		{
+			QRect lineRect(this->rect.x(), this->rect.y(), this->rect.width(), paragraph.sections.first().size.height());
+			QRegion lineRegion = this->region.intersected(lineRect);
+			QVector<QRect> rects = lineRegion.rects();
+			QVector<int> ys;
+			for (i = rects.begin(); i != rects.end(); ++i) {
+				if ((*i).x()
+			}
 		}
 	}
 }
