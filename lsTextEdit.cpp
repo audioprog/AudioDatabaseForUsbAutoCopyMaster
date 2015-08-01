@@ -71,11 +71,8 @@ void lsTextEdit::paint(QPainter* painter)
 		{
 			QRect lineRect(this->rect.x(), this->rect.y(), this->rect.width(), paragraph.sections.first().size.height());
 			QRegion lineRegion = this->region.intersected(lineRect);
-			QVector<QRect> rects = lineRegion.rects();
-			QVector<int> ys;
-			for (i = rects.begin(); i != rects.end(); ++i) {
-				if ((*i).x()
-			}
+			QRect lineRegion = lineRegion.boundingRect();
+			//
 		}
 	}
 }
