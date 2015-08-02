@@ -69,10 +69,83 @@ void lsTextEdit::paint(QPainter* painter)
 		QPointF startPoint;
 		if (this->m_isRegionDirty)
 		{
-			QRect lineRect(this->rect.x(), this->rect.y(), this->rect.width(), paragraph.sections.first().size.height());
+			QRegion rectRegion = this->region.intersected(this->rect);
+			if (rectRegion.isEmpty())
+			{
+				this->m_isEmptyRegion = true;
+				return;
+			}
+			QRect regionRect = rectRegion.boundingRect();
+			if (regionRect.height() < paragraph.sections.first().size.height())
+			{
+				this->m_isEmptyRegion = true;
+				return;
+			}
+
+			int y = regionRect.y();
+
+			QRect lineRect(this->rect.x(), y, this->rect.width(), paragraph.sections.first().size.height());
 			QRegion lineRegion = this->region.intersected(lineRect);
-			QRect lineRegion = lineRegion.boundingRect();
-			//
+
+			QRect innerLineRect = lineRegion.boundingRect();
+
+			int x = innerLineRect.x();
+			int right = x + innerLineRect.width();
+
+			int lastLineSection = 0;
+
+			for (int iSection = 0; iSection < paragraph.sections.count(); iSection++)
+			{
+				bool isSearching = true;
+				while (isSearching)
+				{
+					QRect testRect = QRect(QPoint(x, y), paragraph.sections.at(iSection).minSize);
+					QRegion singleRegion = lineRegion.intersected(testRect);
+					if (singleRegion.isEmpty())
+					{
+						x += paragraph.sections.first().minSize;
+					}
+					else
+					{
+						QRegion insertedSingleRegion = singleRegion.xored(testRect);
+						if (insertedSingleRegion.isEmpty())
+						{
+							paragraph.sections.at(iSection).pos = testRect.topLeft();
+
+							x += paragraph.sections.at(iSection).size.width();
+
+							isSearching = false;
+						}
+						else
+						{
+							x += insertedSingleRegion.boundingRect().width();
+						}
+					}
+
+					if (x > right)
+					{
+						if (iSection == lastLineSection)
+						{
+							y += 5;
+						}
+						else
+						{
+							y += lineRect.height();
+						}
+
+						lineRect = QRect(this->rect.x(), y, this->rect.width(), paragraph.sections.first().size.height());
+						lineRegion = this->region.intersected(lineRect);
+
+						innerLineRect = lineRegion.boundingRect();
+
+						x = innerLineRect.x();
+						right = x + innerLineRect.width();
+
+						lastLineSection = 0;
+					}
+				}
+			QRect innnerRect = lineRegion.boundingRect();
+			if (lineRegion.y() > this->rect)
 		}
 	}
 }
