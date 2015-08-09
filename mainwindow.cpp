@@ -12,13 +12,14 @@
 
 #include <QBoxLayout>
 #include <QDesktopServices>
-#include <QRegExp>
 #include <QFileDialog>
-#include <QMediaPlayer>
-#include <QMediaContent>
-#include <QProgressBar>
-#include <QSettings>
 #include <QFileSystemWatcher>
+#include <QMediaContent>
+#include <QMediaPlayer>
+#include <QProgressBar>
+#include <QRegExp>
+#include <QSettings>
+#include <QTimer>
 #include <QUrl>
 
 #include <QtSql>
@@ -32,6 +33,7 @@ MainWindow::MainWindow(QWidget *parent) :
 				"ON `audio`.`Beitrag`.`GottesdienstId` = `audio`.`GottesdienstId`.`Id` "
 				"WHERE `FileName` LIKE '%%1%' OR `Name` LIKE '%%1%' OR `Art` LIKE '%%1%' OR `Text` LIKE '%%1%' OR `Bibelstelle` LIKE '%%1%' OR `Beschreibung` LIKE '%%1%'")
   , selectedQuery("SELECT TitelNr,Name,Art,Text,Bibelstelle FROM `audio`.`Beitrag` INNER JOIN `audio`.`GottesdienstId` ON `audio`.`Beitrag`.`GottesdienstId` = `audio`.`GottesdienstId`.`Id` WHERE Datum='%1' AND Zeit='%2'")
+  , timerCheck(new QTimer(this))
 {
 	this->fileWatcher = NULL;
 	this->fileList = NULL;
@@ -138,6 +140,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	QSqlQueryModel* selModel = new QSqlQueryModel(ui->tableViewCD);
 	ui->tableViewCD->setModel(selModel);
+
+	connect(this->timerCheck, &QTimer::timeout, this, &MainWindow::slotCheck);
+
+	this->timerCheck->start(20000);
 }
 
 MainWindow::~MainWindow()
@@ -768,6 +774,22 @@ void MainWindow::slotTableViewSelectChanged(const QModelIndex& index, const QMod
 	}
 }
 
+void MainWindow::slotCheck()
+{
+	QList<Einzelbeitrag*> list = this->detEinzelbeitragList();
+
+	for (int i = 0; i < list.count(); i++)
+	{
+		if (list.at(i)->titelNr() != i + 1)
+		{
+			ui->toolButtonReRead->setStyleSheet("background: red;");
+			return;
+		}
+	}
+
+	ui->toolButtonReRead->setStyleSheet("");
+}
+
 void MainWindow::on_actionAddLine_triggered()
 {
     Einzelbeitrag* einzel = new Einzelbeitrag(this);
@@ -1351,5 +1373,21 @@ void MainWindow::on_toolButtonOpenPath_clicked()
 	if ( ! ui->labelPath->text().isEmpty() )
 	{
 		QProcess::execute(QStringLiteral("explorer \"%1\"").arg(ui->labelPath->text().replace('/', '\\')));
+	}
+}
+
+void MainWindow::on_toolButtonReRead_clicked()
+{
+	QString currentTime = ui->comboBoxZeit->currentText();
+
+	if (currentTime == ui->comboBoxZeit->itemText(ui->comboBoxZeit->count() - 1))
+	{
+		ui->comboBoxZeit->setCurrentIndex(0);
+		ui->comboBoxZeit->setCurrentIndex(ui->comboBoxZeit->count() - 1);
+	}
+	else
+	{
+		ui->comboBoxZeit->setCurrentIndex(ui->comboBoxZeit->count() - 1);
+		ui->comboBoxZeit->setCurrentText(currentTime);
 	}
 }

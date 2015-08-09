@@ -105,6 +105,13 @@
             </property>
            </widget>
           </item>
+          <item>
+           <widget class="QToolButton" name="toolButtonReRead">
+            <property name="text">
+             <string>Erneuern</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </item>
         <item>

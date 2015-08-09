@@ -21,6 +21,7 @@ class lsMp3Converter;
 class QCloseEvent;
 class QProgressBar;
 class QSqlTableModel;
+class QTimer;
 
 class MainWindow : public QMainWindow
 {
@@ -78,6 +79,8 @@ private slots:
 
 	void slotTableViewSelectChanged(const QModelIndex &current, const QModelIndex &previous);
 
+	void slotCheck();
+
 private slots:
     void on_actionAddLine_triggered();
 
@@ -108,6 +111,8 @@ private slots:
 	void on_toolButtonGotoFromSearch_clicked();
 
 	void on_toolButtonOpenPath_clicked();
+
+	void on_toolButtonReRead_clicked();
 
 private:
 
@@ -165,6 +170,8 @@ private:
 	QString searchQuery;
 
 	QString selectedQuery;
+
+	QTimer* timerCheck;
 };
 
 #endif // MAINWINDOW_H
