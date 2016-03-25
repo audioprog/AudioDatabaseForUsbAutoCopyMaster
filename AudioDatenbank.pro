@@ -46,7 +46,6 @@ SOURCES += main.cpp\
     lsKeyAndFilterListEditor.cpp \
     lsGlobalSettings.cpp \
     lsMp3Converter.cpp \
-    LsFileList.cpp \
     CompletedLineEdit.cpp \
     ListSelectDialog.cpp \
     ListPrintDialog.cpp \
@@ -150,8 +149,9 @@ SOURCES += main.cpp\
 	taglib/xm/xmfile.cpp \
 	taglib/xm/xmproperties.cpp \
     lsOutputSource.cpp \
-    lsVariantList2D.cpp \
-    lsTextEdit.cpp
+	lsVariantList2D.cpp \
+    LsFileList.cpp \
+    lsSpinBox.cpp
 
 HEADERS  += mainwindow.h \
     Einzelbeitrag.h \
@@ -272,7 +272,7 @@ HEADERS  += mainwindow.h \
 	taglib/taglib_config.h \
     lsOutputSource.h \
     lsVariantList2D.h \
-    lsTextEdit.h
+    lsSpinBox.h
 
 FORMS    += mainwindow.ui \
     Einzelbeitrag.ui \

@@ -98,6 +98,29 @@ void CompletedLineEdit::readWordsAndCreateCompleter(bool isReread)
 	this->c->setWrapAround(false);
 }
 
+bool CompletedLineEdit::event(QEvent* event)
+{
+	if (event->type() != QEvent::KeyPress)
+	{
+		return QLineEdit::event(event);
+	}
+
+	if (reinterpret_cast<QKeyEvent*>(event)->key() != Qt::Key_Tab)
+	{
+		return QLineEdit::event(event);
+	}
+
+	if (c->popup()->currentIndex().isValid())
+	{
+		insertCompletion(c->popup()->model()->data(c->popup()->currentIndex()).toString());
+		c->popup()->hide();
+		event->accept();
+		return true;
+	}
+
+	return false;
+}
+
 void CompletedLineEdit::createFromSimpleDatabaseTable(QSqlDatabase db, const QString& tableName)
 {
 	this->db = db;

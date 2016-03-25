@@ -22,6 +22,7 @@ public:
 	void readWordsAndCreateCompleter( bool isReread = false );
 
 protected:
+	bool event(QEvent* event) Q_DECL_OVERRIDE;
 	void keyPressEvent(QKeyEvent *e) Q_DECL_OVERRIDE;
 	void focusInEvent(QFocusEvent *e) Q_DECL_OVERRIDE;
 
