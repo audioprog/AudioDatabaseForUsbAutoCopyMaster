@@ -19,6 +19,8 @@ public:
 
 	static QString capturePath();
 
+    static QString copyCenterServicePath();
+
 	void load();
 
 	static QString mp3Path();
@@ -35,6 +37,8 @@ private slots:
 	void on_toolButtonMp3Path_clicked();
 
 	void on_toolButtonServerPath_clicked();
+
+    void on_toolButtonCopyCenter_clicked();
 
 private:
 	Ui::lsGlobalSettings *ui;

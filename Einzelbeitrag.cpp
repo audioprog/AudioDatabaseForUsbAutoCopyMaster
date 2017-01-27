@@ -399,17 +399,21 @@ void Einzelbeitrag::insertId3Tag(const QString& path, const QHash<int,QString>& 
 	if (QFile(path + fileName).exists())
 	{
 		QString filePath = path + fileName;
-		TagLib::FileRef tagFile(filePath);
+#ifdef _WIN32
+        TagLib::FileRef tagFile(filePath);
+#else
+        TagLib::FileRef tagFile(filePath.toUtf8().data());
+#endif
 		if ( ! tagFile.isNull() )
 		{
 			TagLib::Tag* tags = tagFile.tag();
 			if (tags != NULL)
 			{
 				QString album = this->parentWindow->getAlbum();
-				tags->setAlbum((this->fileList->getDate().toString("ddd dd.MM.yyyy ") + this->fileList->getDateTime() + " " + album).simplified());
-				tags->setArtist(this->ui->nameLineEdit->text());
-				tags->setTitle((this->art() + " " + this->text() + " " + this->bibelstelle()).simplified());
-				tags->setGenre(this->art());
+                tags->setAlbum((this->fileList->getDate().toString("ddd dd.MM.yyyy ") + this->fileList->getDateTime() + " " + album).simplified().toStdWString());
+                tags->setArtist(this->ui->nameLineEdit->text().toStdWString());
+                tags->setTitle((this->art() + " " + this->text() + " " + this->bibelstelle()).simplified().toStdWString());
+                tags->setGenre(this->art().toStdWString());
 				tags->setTrack(this->ui->titelnummerSpinBox->value());
 				tags->setYear(this->fileList->getDate().year());
 
@@ -521,8 +525,12 @@ void Einzelbeitrag::slotUpdateStates()
 
 	if ( ! filePath.isEmpty())
 	{
-		TagLib::FileRef tagFile(filePath);
-		if ( ! tagFile.isNull() )
+#ifdef _WIN32
+        TagLib::FileRef tagFile(filePath);
+#else
+        TagLib::FileRef tagFile(filePath.toUtf8().data());
+#endif
+        if ( ! tagFile.isNull() )
 		{
 			TagLib::AudioProperties* propertys = tagFile.audioProperties();
 			if (propertys != NULL)
