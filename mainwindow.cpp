@@ -818,11 +818,12 @@ QHash<int, QString> MainWindow::fetchTitlesOfPath(const QString& dir)
 		{
 			QStringList fileList = QDir(path).entryList(QStringList(QStringLiteral("*.mp3")) << QStringLiteral("*.wav"), QDir::Files);
 
-			QRegExp regex(".*(\\d+)\\D.*");
+            QRegExp regex(".*(\\d+).*");
 
 			foreach (const QString& file, fileList)
 			{
-				if (regex.indexIn(file) > -1 && (file.startsWith(QStringLiteral("Tit")) || file.contains(QLatin1Char(' '))))
+                int nrPos = regex.indexIn(file);
+                if (nrPos > -1 && (file.startsWith(QStringLiteral("Tit"), Qt::CaseInsensitive) || nrPos == 0))
 				{
 					fileHash[regex.cap(1).toInt()] = file;
 				}

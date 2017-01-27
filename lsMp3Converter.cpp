@@ -12,7 +12,7 @@ lsMp3Converter::lsMp3Converter(lsGlobalSettings* globalSettings, QObject* parent
 	this->proc = new QProcess(this);
 	this->proc->setProcessChannelMode(QProcess::MergedChannels);
 	connect(this->proc, &QProcess::readyRead, this, &lsMp3Converter::slotProcOutput);
-	connect(this->proc, SIGNAL(finished(int)), this, SLOT(slotFinished()));
+    connect(this->proc, QOverload<int>::of(&QProcess::finished), this, &lsMp3Converter::slotFinished);
 }
 
 lsMp3Converter::~lsMp3Converter()
@@ -160,7 +160,7 @@ void lsMp3Converter::slotFinished()
 
 		this->currentProcessing = toConvert;
 
-		this->proc->start("\"C:/Program Files/lame/lame.exe\" " + params.join(" ").replace("/", "\\"));
+        this->proc->start("\"C:/Program Files (x86)/lame/lame.exe\" " + params.join(" ").replace("/", "\\"));
 	}
 }
 

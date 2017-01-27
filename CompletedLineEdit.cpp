@@ -110,12 +110,16 @@ bool CompletedLineEdit::event(QEvent* event)
 		return QLineEdit::event(event);
 	}
 
-	if (c->popup()->currentIndex().isValid())
+    if (c && c->popup() && c->popup()->isVisible() && c->popup()->currentIndex().isValid())
 	{
 		insertCompletion(c->popup()->model()->data(c->popup()->currentIndex()).toString());
 		c->popup()->hide();
 		event->accept();
 		return true;
+	}
+	else
+	{
+		return QLineEdit::event(event);
 	}
 
 	return false;
