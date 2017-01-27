@@ -8,7 +8,7 @@ QT       += core gui sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets multimedia
 
-TARGET = AudioDatenbank
+TARGET = AudioDatenbank2
 TEMPLATE = app
 
 unix {
