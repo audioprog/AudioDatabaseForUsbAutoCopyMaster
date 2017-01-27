@@ -27,6 +27,13 @@ QString lsGlobalSettings::capturePath()
 	return self->ui->lineEditCapturePath->text();
 }
 
+QString lsGlobalSettings::copyCenterServicePath()
+{
+	if (self == Q_NULLPTR) { return QString(); }
+
+	return self->ui->lineEditCopyCenter->text();
+}
+
 void lsGlobalSettings::load()
 {
 	QSettings settings;
@@ -35,6 +42,7 @@ void lsGlobalSettings::load()
 	ui->lineEditServerPath->setText(settings.value(QStringLiteral("Serverpath"), QStringLiteral("S:")).toString());
 	ui->lineEditMp3Path->setText(settings.value(QStringLiteral("Mp3Path"), QStringLiteral("D:/MP3")).toString());
 	ui->lineEditCapturePath->setText(settings.value(QStringLiteral("CapturePath"), QStringLiteral("E:/Gottesdienste Aufnahme")).toString());
+	ui->lineEditCopyCenter->setText(settings.value(QStringLiteral("CopyCenterServicePath")).toString());
 
 	settings.endGroup();
 }
@@ -54,6 +62,7 @@ void lsGlobalSettings::save()
 	settings.setValue(QStringLiteral("Serverpath"), ui->lineEditServerPath->text());
 	settings.setValue(QStringLiteral("Mp3Path"), ui->lineEditMp3Path->text());
 	settings.setValue(QStringLiteral("CapturePath"), ui->lineEditCapturePath->text());
+	settings.setValue(QStringLiteral("CopyCenterServicePath"), ui->lineEditCopyCenter->text());
 
 	settings.endGroup();
 }
@@ -114,5 +123,14 @@ void lsGlobalSettings::on_toolButtonServerPath_clicked()
 	if ( ! path.isEmpty())
 	{
 		ui->lineEditServerPath->setText(path);
+	}
+}
+
+void lsGlobalSettings::on_toolButtonCopyCenter_clicked()
+{
+	QString path = QFileDialog::getExistingDirectory(this, QStringLiteral("CopyCenter"), ui->lineEditServerPath->text());
+	if ( ! path.isEmpty())
+	{
+		ui->lineEditCopyCenter->setText(path);
 	}
 }

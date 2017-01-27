@@ -114,6 +114,8 @@ private slots:
 
 	void on_toolButtonReRead_clicked();
 
+    void on_toolButtonPush_clicked();
+
 private:
 
 	void addConnections(Einzelbeitrag* einzel);

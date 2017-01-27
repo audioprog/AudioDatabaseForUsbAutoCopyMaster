@@ -1391,3 +1391,15 @@ void MainWindow::on_toolButtonReRead_clicked()
 		ui->comboBoxZeit->setCurrentText(currentTime);
 	}
 }
+
+void MainWindow::on_toolButtonPush_clicked()
+{
+	QList<Einzelbeitrag*> samples = this->detEinzelbeitragList();
+
+	QString srcPath = this->detFullPath(this->ui->globalSettings->mp3Path());
+
+	for (Einzelbeitrag* sample : samples)
+	{
+		sample->;
+	}
+}
