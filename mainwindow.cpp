@@ -1460,13 +1460,19 @@ QString MainWindow::detCopyCenterSubPath(const QDate& date, const QString& dayTi
 	return copyCenterSubPath;
 }
 
-void MainWindow::on_toolButtonPush_clicked()
+void MainWindow::copyToCopyCenter(const QDate& date, const QString& dayTime)
 {
-	QString srcPath = this->detFullPath(this->ui->globalSettings->mp3Path());
+	QString preSubPath = this->ui->globalSettings->subPath(date);
+	QString path = ui->globalSettings->mp3Path();
+	if ( ! path.endsWith('/'))
+	{
+		path += "/";
+	}
+	QString srcPath = path + preSubPath;
 
 	QString tarPath = this->ui->globalSettings->copyCenterServicePath();
 
-	QString copyCenterSubPath = this->detCopyCenterSubPath(ui->dateEdit->date(), ui->comboBoxZeit->currentText());
+	QString copyCenterSubPath = this->detCopyCenterSubPath(date, dayTime);
 
 	if ( ! tarPath.endsWith('/') && ! copyCenterSubPath.startsWith('/'))
 	{
@@ -1475,4 +1481,36 @@ void MainWindow::on_toolButtonPush_clicked()
 	tarPath += copyCenterSubPath;
 
 	apFileUtils::copyRecursively(srcPath, tarPath);
+
+	if ( ! tarPath.endsWith('/'))
+	{
+		tarPath += '/';
+	}
+	QFile file(tarPath + dayTime + ".txt");
+	file.open(QFile::WriteOnly);
+	file.write("AudioDatabase");
+	file.close();
+}
+
+void MainWindow::on_toolButtonPush_clicked()
+{
+	this->copyToCopyCenter(ui->dateEdit->date(), ui->comboBoxZeit->currentText());
+}
+
+void MainWindow::on_actionAlles_kopieren_triggered()
+{
+	QString select = "SELECT Datum,Zeit FROM `audio`.`GottesdienstId` ORDER BY Datum,Zeit";
+
+	QSqlQuery query = this->db.exec(select);
+
+	int indexDate = query.record().indexOf("Datum");
+	int indexDayTime = query.record().indexOf("Zeit");
+
+	while (query.next())
+	{
+		QDate date = query.record().value(indexDate).toDate();
+		QString dayTime = query.record().value(indexDayTime).toString();
+
+		this->copyToCopyCenter(date, dayTime);
+	}
 }

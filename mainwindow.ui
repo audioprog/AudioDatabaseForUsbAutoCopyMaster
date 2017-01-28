@@ -302,7 +302,14 @@
     <addaction name="actionVerwaltung"/>
     <addaction name="menu_Sammeln"/>
    </widget>
+   <widget class="QMenu" name="menuCopyCenter">
+    <property name="title">
+     <string>&amp;CopyCenter</string>
+    </property>
+    <addaction name="actionAlles_kopieren"/>
+   </widget>
    <addaction name="menuDatenbankpflege"/>
+   <addaction name="menuCopyCenter"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -368,6 +375,11 @@
   <action name="actionPrintpreview">
    <property name="text">
     <string>Druckvorschau</string>
+   </property>
+  </action>
+  <action name="actionAlles_kopieren">
+   <property name="text">
+    <string>Alles kopieren</string>
    </property>
   </action>
  </widget>

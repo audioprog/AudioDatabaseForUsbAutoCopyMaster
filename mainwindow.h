@@ -54,6 +54,8 @@ public:
         
 	QString detCopyCenterSubPath(const QDate& date, const QString& dayTime);
         
+	void copyToCopyCenter(const QDate& date, const QString& dayTime);
+
 protected:
 	void closeEvent( QCloseEvent* event );
 
@@ -118,6 +120,8 @@ private slots:
 	void on_toolButtonReRead_clicked();
 
     void on_toolButtonPush_clicked();
+
+	void on_actionAlles_kopieren_triggered();
 
 private:
 
