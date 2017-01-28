@@ -287,10 +287,10 @@ SOURCES += main.cpp\
     ListPrintDialog.cpp \
 	PainterWidget.cpp \
     lsOutputSource.cpp \
-	lsVariantList2D.cpp \
     LsFileList.cpp \
     lsSpinBox.cpp \
-    lsVariantList2D.cpp
+    apGlobalHelper.cpp \
+    apFileUtils.cpp
 
 HEADERS  += mainwindow.h \
     Einzelbeitrag.h \
@@ -307,9 +307,9 @@ HEADERS  += mainwindow.h \
     PainterWidget.h \
 	printInterface.h \
     lsOutputSource.h \
-    lsVariantList2D.h \
     lsSpinBox.h \
-    lsVariantList2D.h
+    apGlobalHelper.h \
+    apFileUtils.h
 
 FORMS    += mainwindow.ui \
     Einzelbeitrag.ui \

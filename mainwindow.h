@@ -51,6 +51,9 @@ public:
 
 	QStringList searchNewWords(const QString& tableName, const QStringList& wordList, int minCount);
 	QList<Einzelbeitrag*> detEinzelbeitragList();
+        
+	QString detCopyCenterSubPath(const QDate& date, const QString& dayTime);
+        
 protected:
 	void closeEvent( QCloseEvent* event );
 

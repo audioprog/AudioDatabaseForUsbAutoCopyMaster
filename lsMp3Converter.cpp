@@ -1,6 +1,7 @@
 #include "lsMp3Converter.h"
 
 #include "Einzelbeitrag.h"
+#include "apGlobalHelper.h"
 #include "lsGlobalSettings.h"
 
 #include <QDir>

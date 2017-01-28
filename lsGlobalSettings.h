@@ -21,6 +21,8 @@ public:
 
     static QString copyCenterServicePath();
 
+	static QString copyCenterSubPathFormat();
+
 	void load();
 
 	static QString mp3Path();

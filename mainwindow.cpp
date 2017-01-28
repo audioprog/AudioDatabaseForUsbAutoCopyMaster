@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include "apFileUtils.h"
+#include "apGlobalHelper.h"
 #include "Einzelbeitrag.h"
 #include "PathScannerThread.h"
 #include "LsFileList.h"
@@ -1393,14 +1395,84 @@ void MainWindow::on_toolButtonReRead_clicked()
 	}
 }
 
+QString MainWindow::detCopyCenterSubPath(const QDate& date, const QString& dayTime)
+{
+	QString copyCenterSubPath = this->ui->globalSettings->copyCenterSubPathFormat();
+
+	int indexLt = copyCenterSubPath.indexOf('<');
+	int indexGt = copyCenterSubPath.indexOf('>');
+	while (indexLt > -1 || indexGt > -1)
+	{
+		if (indexLt == -1 || indexGt == -1)
+		{
+			if (indexLt > -1)
+			{
+				copyCenterSubPath.remove('<');
+			}
+			else if (indexGt > -1)
+			{
+				copyCenterSubPath.remove('>');
+			}
+		}
+		else if (indexLt > indexGt)
+		{
+			copyCenterSubPath.remove(indexGt, 1);
+		}
+		else
+		{
+			QString midString = copyCenterSubPath.mid(indexLt + 1, indexGt - indexLt - 1).toLower().replace('m', 'M');
+
+			if (midString == "c")
+			{
+				if (dayTime.startsWith('T', Qt::CaseInsensitive))
+				{
+					int nr = dayTime.right(1).toInt();
+					if (nr > 0)
+					{
+						midString = QString(1, QChar('a' - 1 + nr));
+					}
+				}
+				else if (dayTime.startsWith('M', Qt::CaseInsensitive))
+				{
+					midString = "a";
+				}
+				else if (dayTime.startsWith('N', Qt::CaseInsensitive))
+				{
+					midString = "b";
+				}
+				else
+				{
+					midString = "c";
+				}
+			}
+			else
+			{
+				midString = date.toString(midString);
+			}
+
+			copyCenterSubPath = copyCenterSubPath.left(indexLt) + midString + copyCenterSubPath.mid(indexGt + 1);
+		}
+
+		indexLt = copyCenterSubPath.indexOf('<');
+		indexGt = copyCenterSubPath.indexOf('>');
+	}
+
+	return copyCenterSubPath;
+}
+
 void MainWindow::on_toolButtonPush_clicked()
 {
-	QList<Einzelbeitrag*> samples = this->detEinzelbeitragList();
-
 	QString srcPath = this->detFullPath(this->ui->globalSettings->mp3Path());
 
-	for (Einzelbeitrag* sample : samples)
+	QString tarPath = this->ui->globalSettings->copyCenterServicePath();
+
+	QString copyCenterSubPath = this->detCopyCenterSubPath(ui->dateEdit->date(), ui->comboBoxZeit->currentText());
+
+	if ( ! tarPath.endsWith('/') && ! copyCenterSubPath.startsWith('/'))
 	{
-		sample->;
+		tarPath += "/";
 	}
+	tarPath += copyCenterSubPath;
+
+	apFileUtils::copyRecursively(srcPath, tarPath);
 }
