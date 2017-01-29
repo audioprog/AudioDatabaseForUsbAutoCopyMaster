@@ -54,7 +54,7 @@ public:
         
 	QString detCopyCenterSubPath(const QDate& date, const QString& dayTime);
         
-	void copyToCopyCenter(const QDate& date, const QString& dayTime);
+    void copyToCopyCenter(const QDate& date, const QString& dayTime, bool forceUpdate = false);
 
 protected:
 	void closeEvent( QCloseEvent* event );

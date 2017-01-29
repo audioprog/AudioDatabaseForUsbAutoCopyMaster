@@ -3,6 +3,7 @@
 
 #include <qglobal.h>
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 7, 0)
 template <typename... Args>
 struct QNonConstOverload
 {
@@ -37,6 +38,7 @@ struct QOverload : QConstOverload<Args...>, QNonConstOverload<Args...>
 	static Q_DECL_CONSTEXPR auto of(R (*ptr)(Args...)) Q_DECL_NOTHROW -> decltype(ptr)
 	{ return ptr; }
 };
+#endif
 
 class apGlobalHelper
 {

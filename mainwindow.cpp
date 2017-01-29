@@ -1445,6 +1445,33 @@ QString MainWindow::detCopyCenterSubPath(const QDate& date, const QString& dayTi
 					midString = "c";
 				}
 			}
+            else if (midString == "d")
+            {
+                switch (date.dayOfWeek())
+                {
+                case 1:
+                    midString = "Mo";
+                    break;
+                case 2:
+                    midString = "Di";
+                    break;
+                case 3:
+                    midString = "Mi";
+                    break;
+                case 4:
+                    midString = "Do";
+                    break;
+                case 5:
+                    midString = "Fr";
+                    break;
+                case 6:
+                    midString = "Sa";
+                    break;
+                default:
+                    midString = "So";
+                    break;
+                }
+            }
 			else
 			{
 				midString = date.toString(midString);
@@ -1460,41 +1487,69 @@ QString MainWindow::detCopyCenterSubPath(const QDate& date, const QString& dayTi
 	return copyCenterSubPath;
 }
 
-void MainWindow::copyToCopyCenter(const QDate& date, const QString& dayTime)
+void MainWindow::copyToCopyCenter(const QDate& date, const QString& dayTime, bool forceUpdate)
 {
-	QString preSubPath = this->ui->globalSettings->subPath(date);
-	QString path = ui->globalSettings->mp3Path();
-	if ( ! path.endsWith('/'))
-	{
-		path += "/";
-	}
-	QString srcPath = path + preSubPath;
+    QString srcPath;
 
-	QString tarPath = this->ui->globalSettings->copyCenterServicePath();
+    QList<PathScannerThread::SDirInfo> list = this->mp3PathScanner->hashDateDirInfo.values(date);
+    for (const PathScannerThread::SDirInfo& item : list)
+    {
+        if (item.dayTime == dayTime)
+        {
+            srcPath = item.path;
+            break;
+        }
+    }
 
-	QString copyCenterSubPath = this->detCopyCenterSubPath(date, dayTime);
+    if (srcPath.isEmpty())
+    {
+        QList<PathScannerThread::SDirInfo> slist = this->serverPathScanner->hashDateDirInfo.values(date);
+        for (const PathScannerThread::SDirInfo& item : slist)
+        {
+            if (item.dayTime == dayTime)
+            {
+                srcPath = item.path;
+            }
+        }
+    }
 
-	if ( ! tarPath.endsWith('/') && ! copyCenterSubPath.startsWith('/'))
-	{
-		tarPath += "/";
-	}
-	tarPath += copyCenterSubPath;
+    if (srcPath.isEmpty() && list.count() == 1
+            && list.first().dayTime.left(1).toUpper() == dayTime.left(1).toUpper())
+    {
+        srcPath = list.first().path;
+    }
 
-	apFileUtils::copyRecursively(srcPath, tarPath);
+    if ( ! srcPath.isNull())
+    {
+        QString tarPath = this->ui->globalSettings->copyCenterServicePath();
 
-	if ( ! tarPath.endsWith('/'))
-	{
-		tarPath += '/';
-	}
-	QFile file(tarPath + dayTime + ".txt");
-	file.open(QFile::WriteOnly);
-	file.write("AudioDatabase");
-	file.close();
+        QString copyCenterSubPath = this->detCopyCenterSubPath(date, dayTime);
+
+        if ( ! tarPath.endsWith('/') && ! copyCenterSubPath.startsWith('/'))
+        {
+            tarPath += "/";
+        }
+        tarPath += copyCenterSubPath;
+
+        if (forceUpdate || ! QDir(tarPath).exists())
+        {
+            apFileUtils::copyRecursively(srcPath, tarPath);
+
+            if ( ! tarPath.endsWith('/'))
+            {
+                tarPath += '/';
+            }
+            QFile file(tarPath + dayTime + ".txt");
+            file.open(QFile::WriteOnly);
+            file.write("AudioDatabase");
+            file.close();
+        }
+    }
 }
 
 void MainWindow::on_toolButtonPush_clicked()
 {
-	this->copyToCopyCenter(ui->dateEdit->date(), ui->comboBoxZeit->currentText());
+    this->copyToCopyCenter(ui->dateEdit->date(), ui->comboBoxZeit->currentText(), true);
 }
 
 void MainWindow::on_actionAlles_kopieren_triggered()
