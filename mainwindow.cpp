@@ -18,6 +18,7 @@
 #include <QFileSystemWatcher>
 #include <QMediaContent>
 #include <QMediaPlayer>
+#include <QMessageBox>
 #include <QProgressBar>
 #include <QRegExp>
 #include <QSettings>
@@ -1550,10 +1551,14 @@ void MainWindow::copyToCopyCenter(const QDate& date, const QString& dayTime, boo
 void MainWindow::on_toolButtonPush_clicked()
 {
     this->copyToCopyCenter(ui->dateEdit->date(), ui->comboBoxZeit->currentText(), true);
+
+    QMessageBox::information(this, "Fertig", "Kopieren auf UsbCopyCenter ist fertig.");
 }
 
 void MainWindow::on_actionAlles_kopieren_triggered()
 {
+    // Überbrückt, ist bei uns nicht mehr notwendig.
+    return;
 	QString select = "SELECT Datum,Zeit FROM `audio`.`GottesdienstId` ORDER BY Datum,Zeit";
 
 	QSqlQuery query = this->db.exec(select);

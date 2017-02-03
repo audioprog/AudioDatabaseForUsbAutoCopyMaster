@@ -124,6 +124,9 @@
             <property name="toolTip">
              <string>Zu CopyCener kopieren</string>
             </property>
+            <property name="styleSheet">
+             <string notr="true">background: red;</string>
+            </property>
             <property name="text">
              <string>^^</string>
             </property>
@@ -175,8 +178,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>944</width>
-             <height>301</height>
+             <width>946</width>
+             <height>367</height>
             </rect>
            </property>
           </widget>
@@ -285,7 +288,7 @@
      <x>0</x>
      <y>0</y>
      <width>954</width>
-     <height>30</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuDatenbankpflege">
