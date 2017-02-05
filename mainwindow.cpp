@@ -1488,7 +1488,7 @@ QString MainWindow::detCopyCenterSubPath(const QDate& date, const QString& dayTi
 	return copyCenterSubPath;
 }
 
-void MainWindow::copyToCopyCenter(const QDate& date, const QString& dayTime, bool forceUpdate)
+bool MainWindow::copyToCopyCenter(const QDate& date, const QString& dayTime, bool forceUpdate)
 {
     QString srcPath;
 
@@ -1520,7 +1520,11 @@ void MainWindow::copyToCopyCenter(const QDate& date, const QString& dayTime, boo
         srcPath = list.first().path;
     }
 
-    if ( ! srcPath.isNull())
+	if (srcPath.isNull())
+	{
+		QMessageBox::information(this, "Quelle", "Quelle nicht gefunden");
+	}
+	else
     {
         QString tarPath = this->ui->globalSettings->copyCenterServicePath();
 
@@ -1534,25 +1538,35 @@ void MainWindow::copyToCopyCenter(const QDate& date, const QString& dayTime, boo
 
         if (forceUpdate || ! QDir(tarPath).exists())
         {
-            apFileUtils::copyRecursively(srcPath, tarPath);
+			if (apFileUtils::copyRecursively(srcPath, tarPath))
+			{
+				if ( ! tarPath.endsWith('/'))
+				{
+					tarPath += '/';
+				}
+				QFile file(tarPath + dayTime + ".txt");
+				file.open(QFile::WriteOnly);
+				file.write("AudioDatabase");
+				file.close();
 
-            if ( ! tarPath.endsWith('/'))
-            {
-                tarPath += '/';
-            }
-            QFile file(tarPath + dayTime + ".txt");
-            file.open(QFile::WriteOnly);
-            file.write("AudioDatabase");
-            file.close();
+				return true;
+			}
         }
     }
+
+	return false;
 }
 
 void MainWindow::on_toolButtonPush_clicked()
 {
-    this->copyToCopyCenter(ui->dateEdit->date(), ui->comboBoxZeit->currentText(), true);
-
-    QMessageBox::information(this, "Fertig", "Kopieren auf UsbCopyCenter ist fertig.");
+	if (this->copyToCopyCenter(ui->dateEdit->date(), ui->comboBoxZeit->currentText(), true))
+	{
+		QMessageBox::information(this, "Fertig", "Kopieren auf UsbCopyCenter ist fertig.");
+	}
+	else
+	{
+		QMessageBox::warning(this, "Fehler", "Nicht kopiert");
+	}
 }
 
 void MainWindow::on_actionAlles_kopieren_triggered()
