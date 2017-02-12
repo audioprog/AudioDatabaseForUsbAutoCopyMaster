@@ -1520,6 +1520,43 @@ bool MainWindow::copyToCopyCenter(const QDate& date, const QString& dayTime, boo
         srcPath = list.first().path;
     }
 
+    if (srcPath.isEmpty() && this->ui->dateEdit->date() == date
+            && dayTime.startsWith(this->ui->comboBoxZeit->currentText().left(1), Qt::CaseInsensitive)
+            && ( ! dayTime.startsWith("t", Qt::CaseInsensitive) || dayTime.right(1) == this->ui->comboBoxZeit->currentText().right(1) ))
+    {
+        QString preSubPath = this->ui->globalSettings->subPath(date);
+
+        QString mp3Path = this->ui->globalSettings->mp3Path();
+
+        if ( ! mp3Path.isEmpty() )
+        {
+            if ( ! mp3Path.endsWith('/'))
+            {
+                mp3Path += QStringLiteral("/");
+            }
+
+            if (QDir(mp3Path + preSubPath).exists())
+            {
+                mp3Path += preSubPath;
+                if ( ! mp3Path.endsWith('/'))
+                {
+                    mp3Path += QStringLiteral("/");
+                }
+            }
+
+            mp3Path += this->detSubPath();
+            if ( ! mp3Path.endsWith('/'))
+            {
+                mp3Path += QStringLiteral("/");
+            }
+
+            if (QDir(mp3Path).exists())
+            {
+                srcPath = mp3Path;
+            }
+        }
+    }
+
 	if (srcPath.isNull())
 	{
 		QMessageBox::information(this, "Quelle", "Quelle nicht gefunden");
@@ -1571,7 +1608,7 @@ void MainWindow::on_toolButtonPush_clicked()
 
 void MainWindow::on_actionAlles_kopieren_triggered()
 {
-    // Überbrückt, ist bei uns nicht mehr notwendig.
+    QMessageBox::information(this, "Abgeschaltet", "Diese Funktion ist abgeschaltet.");// Überbrückt, ist bei uns nicht mehr notwendig.
     return;
 	QString select = "SELECT Datum,Zeit FROM `audio`.`GottesdienstId` ORDER BY Datum,Zeit";
 
