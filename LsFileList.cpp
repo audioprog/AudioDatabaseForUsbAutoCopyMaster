@@ -12,6 +12,15 @@ LsFileList::LsFileList(QObject *parent)
 
 LsFileList::~LsFileList()
 {
+	while (this->isRunning())
+	{
+		this->requestInterruption();
+
+		if (this->wait(20000))
+		{
+			break;
+		}
+	}
 }
 
 void LsFileList::changeCurrent(const QString& subPath, const QDate& newDate, const QString& newDateTime)
@@ -214,7 +223,7 @@ QString LsFileList::fillDirHash(QHash<int,QString>& fileNrHash, QMutex& mutexDir
 
 void LsFileList::run()
 {
-	while ( ! this->isInterruptionRequested())
+	while ( ! this->isInterruptionRequested() && this->globalSettings)
 	{
 		this->pathCapture = this->fillDirHash(this->dirCapture, this->mutexDirCapture, this->globalSettings->capturePath());
 		this->pathMp3 = this->fillDirHash(this->dirLocal, this->mutexDirLocal, this->globalSettings->mp3Path());

@@ -17,6 +17,7 @@ lsGlobalSettings::lsGlobalSettings(QWidget *parent) :
 
 lsGlobalSettings::~lsGlobalSettings()
 {
+	self = Q_NULLPTR;
 	delete ui;
 }
 

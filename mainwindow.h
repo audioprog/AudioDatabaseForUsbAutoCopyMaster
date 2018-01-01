@@ -47,6 +47,8 @@ public:
 
 	QString getAlbum() const;
 
+	void log(const QString& modul, const QString& logText);
+
 	void updateFileWatcher();
 
 	QStringList searchNewWords(const QString& tableName, const QStringList& wordList, int minCount);

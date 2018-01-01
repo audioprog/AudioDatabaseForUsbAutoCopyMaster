@@ -453,6 +453,13 @@ QString MainWindow::getAlbum() const
 	return this->ui->lineEditBeschreibung->text();
 }
 
+void MainWindow::log(const QString& modul, const QString& logText)
+{
+	ui->plainTextEditDebug->textCursor().movePosition(QTextCursor::End, QTextCursor::MoveAnchor);
+
+	ui->plainTextEditDebug->insertPlainText(modul % "\n\t" % logText % "\n");
+}
+
 void MainWindow::setTitleNrsStartsAt(int index)
 {
 	for (int i = index; i < this->ui->scrollArea->widget()->layout()->count(); i++)

@@ -53,6 +53,8 @@ public:
 
 	QString findBestMatch( const QString& fileName, const QStringList& list, QLineEdit* lineEdit );
 
+	QString getBeitragsart() const;
+
 	const QString& getSubPath() const { return this->subPath; }
 
 	QString name() const;
@@ -79,7 +81,12 @@ public:
 
 	void setFileList( LsFileList* newFileList ) { this->fileList = newFileList; }
 
-	void insertId3Tag(const QString& path, const QHash<int, QString>& names);
+	bool insertId3Tag( const QString& path, const QHash<int, QString>& names );
+
+	static void correctForbiddenChars( QString& toCorrect );
+
+	static QString correctForbiddenChars(const QString& rawFileName);
+
 public slots:
 	void slotMp3Progress( int percent );
 
@@ -123,6 +130,8 @@ private:
 	QString intUpdateState(eState& curState, QLabel* label, QHash<int,QString> files, int titleNr, QString rightFileName , const QString& path);
 
 	void intUpdateState(QLabel* label, eState& curState, const QString& path, eState nonExistState, const QString& extension);
+
+	void log( const QString& logText );
 
 private:
 	Ui::Einzelbeitrag *ui;

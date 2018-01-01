@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>AudioDatenbank 0.1</string>
+   <string>AudioDatenbank 0.2</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -275,6 +275,16 @@
        <layout class="QVBoxLayout" name="verticalLayout_4">
         <item>
          <widget class="lsGlobalSettings" name="globalSettings" native="true"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_3">
+       <attribute name="title">
+        <string>Debug</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_6">
+        <item>
+         <widget class="QPlainTextEdit" name="plainTextEditDebug"/>
         </item>
        </layout>
       </widget>

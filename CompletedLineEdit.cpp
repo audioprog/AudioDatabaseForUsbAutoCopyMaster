@@ -169,16 +169,18 @@ QPair<int,int> CompletedLineEdit::wordRangeUnderCursor() const
 		return QPair<int,int>(-1, -1);
 	}
 
+	static QString eow(" ~!@#$%^&*()_+{}|:\"<>?,./;'[]\\-="); // end of word
+
 	for (int i = start > 0 ? start - 1 : 0; i > -1; i--)
 	{
 		const QChar& chr = text.at(i);
-		if ( (chr >= 'A' && chr <= 'Z') || (chr >= 'a' && chr <= 'z') )
+		if (eow.contains(chr))
 		{
-			start = i;
+			break;
 		}
 		else
 		{
-			break;
+			start = i;
 		}
 	}
 
@@ -186,13 +188,13 @@ QPair<int,int> CompletedLineEdit::wordRangeUnderCursor() const
 	for (int i = start; i < text.count(); i++)
 	{
 		const QChar& chr = text.at(i);
-		if ( (chr >= 'A' && chr <= 'Z') || (chr >= 'a' && chr <= 'z') )
+		if (eow.contains(chr))
 		{
-			end = i + 1;
+			break;
 		}
 		else
 		{
-			break;
+			end = i + 1;
 		}
 	}
 

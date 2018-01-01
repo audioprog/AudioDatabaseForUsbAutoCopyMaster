@@ -23,6 +23,8 @@ public:
 public:
 	explicit PathScannerThread(QObject *parent = 0);
 
+	~PathScannerThread();
+
 	QString baseDir;
 
 	QHash<QDate,SDirInfo> hashDateDirInfo;

@@ -1,5 +1,6 @@
 #include "PathScannerThread.h"
 
+#include <QCoreApplication>
 #include <QDir>
 #include <QRegExp>
 #include <QStringList>
@@ -7,6 +8,21 @@
 PathScannerThread::PathScannerThread(QObject *parent) :
 	QThread(parent)
 {
+}
+
+PathScannerThread::~PathScannerThread()
+{
+	while (this->isRunning())
+	{
+		this->requestInterruption();
+
+		QCoreApplication::processEvents();
+
+		if (this->wait(2000))
+		{
+			break;
+		}
+	}
 }
 
 PathScannerThread::SDirInfo PathScannerThread::dateFromPath(const QString& path) const
@@ -91,6 +107,8 @@ bool PathScannerThread::recursiveSearch(const QFileInfo& infoItem)
 	QFileInfoList infoList = QDir(infoItem.absoluteFilePath()).entryInfoList(QDir::AllDirs | QDir::NoDotAndDotDot);
 	foreach (const QFileInfo& item, infoList)
 	{
+		if (this->isInterruptionRequested()) { return true; }
+
 		if ( ! recursiveSearch(item))
 		{
 			QString path = item.absoluteFilePath();
@@ -118,10 +136,16 @@ void PathScannerThread::run()
 	recursiveSearch(QFileInfo(this->baseDir));
 
 	QHash<QDate,SDirInfo> newDateHash;
-	foreach (const SDirInfo& item, this->dateSDirInfoList)
+	if ( ! this->isInterruptionRequested())
 	{
-		newDateHash.insertMulti(item.date, item);
+		foreach (const SDirInfo& item, this->dateSDirInfoList)
+		{
+			newDateHash.insertMulti(item.date, item);
+		}
 	}
 
-	this->hashDateDirInfo.swap(newDateHash);
+	if ( ! this->isInterruptionRequested())
+	{
+		this->hashDateDirInfo.swap(newDateHash);
+	}
 }

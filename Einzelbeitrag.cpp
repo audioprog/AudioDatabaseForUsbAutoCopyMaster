@@ -77,12 +77,35 @@ Einzelbeitrag::~Einzelbeitrag()
 
 QString Einzelbeitrag::art() const
 {
-	return ui->beitragsartLineEdit->text().replace('\'', '\"');
+	return this->getBeitragsart();
 }
 
 QString Einzelbeitrag::bibelstelle() const
 {
 	return ui->bibelstelleLineEdit->text().replace('\'', '\"');
+}
+
+void Einzelbeitrag::correctForbiddenChars(QString& toCorrect)
+{
+	QString forbidden("\\/:?\"<>|+*'");
+	for (const QChar& forbiddenChar : forbidden)
+	{
+		toCorrect.replace(forbiddenChar, ' ');
+	}
+	toCorrect = toCorrect.simplified();
+}
+
+QString Einzelbeitrag::correctForbiddenChars(const QString& rawFileName)
+{
+	QString toCorrect = rawFileName;
+	QString forbidden("\\/:?\"<>|+*'&");
+	for (const QChar& forbiddenChar : forbidden)
+	{
+		toCorrect.replace(forbiddenChar, ' ');
+	}
+	toCorrect = toCorrect.simplified();
+
+	return toCorrect;
 }
 
 QDate Einzelbeitrag::detDate() const
@@ -213,6 +236,11 @@ QString Einzelbeitrag::findBestMatch(const QString& fileName, const QStringList&
 	return fileName;
 }
 
+QString Einzelbeitrag::getBeitragsart() const
+{
+	return Einzelbeitrag::correctForbiddenChars(this->ui->beitragsartLineEdit->text());
+}
+
 void Einzelbeitrag::intUpdateState(QLabel* label, eState& curState, const QString& path, eState nonExistState, const QString& extension)
 {
 	eState newState = curState;
@@ -237,6 +265,8 @@ void Einzelbeitrag::intUpdateState(QLabel* label, eState& curState, const QStrin
 			QStringList test = filenames.filter(QRegExp(regStr));
 			test << filenames.filter(QRegExp(QStringLiteral("^0*%1 .+").arg(this->titelNr())));
 			test << filenames.filter(QRegExp(QStringLiteral("^Tit[le][el]0*%1[^0-9]").arg(this->titelNr())));
+			test << filenames.filter(QRegExp(QStringLiteral("^0*%1\..*").arg(this->titelNr())));
+			test << filenames.filter(QRegExp(QStringLiteral("^wav0*%1[^0-9].*").arg(this->titelNr())));
 
 			test.removeDuplicates();
 
@@ -270,26 +300,36 @@ void Einzelbeitrag::intUpdateState(QLabel* label, eState& curState, const QStrin
 	}
 }
 
+void Einzelbeitrag::log(const QString& logText)
+{
+	this->parentWindow->log(this->newFileName() % " " % this->fileName(), logText);
+}
+
 QString Einzelbeitrag::name() const
 {
-	return ui->nameLineEdit->text().replace('\'', '\"');
+	return Einzelbeitrag::correctForbiddenChars((const QString)(ui->nameLineEdit->text().replace('\'', '\"')));
 }
 
 QString Einzelbeitrag::newFileName() const
 {
-	QString name = QStringLiteral("%1 %2 %3 %4 %5").arg(ui->titelnummerSpinBox->value(), 2, 10, QLatin1Char('0')).arg(ui->nameLineEdit->text()).arg(ui->beitragsartLineEdit->text())
-			.arg(ui->themaLineEdit->text()).arg(ui->bibelstelleLineEdit->text()).simplified();
+
+	QString nameLineEdit = Einzelbeitrag::correctForbiddenChars(ui->nameLineEdit->text());
+	QString beitragsart = this->getBeitragsart();
+	QString thema = Einzelbeitrag::correctForbiddenChars(ui->themaLineEdit->text());
+
+	QString name = QStringLiteral("%1 %2 %3 %4 %5").arg(ui->titelnummerSpinBox->value(), 2, 10, QLatin1Char('0')).arg(nameLineEdit).arg(beitragsart)
+			.arg(thema).arg(Einzelbeitrag::correctForbiddenChars(ui->bibelstelleLineEdit->text())).simplified();
 	if (name.count() > 256)
 	{
-		name = QStringLiteral("%1 %2 %3 %4").arg(ui->titelnummerSpinBox->value(), 2, 10, QLatin1Char('0')).arg(ui->nameLineEdit->text()).arg(ui->beitragsartLineEdit->text())
-				.arg(ui->themaLineEdit->text()).simplified();
+		name = QStringLiteral("%1 %2 %3 %4").arg(ui->titelnummerSpinBox->value(), 2, 10, QLatin1Char('0')).arg(nameLineEdit).arg(beitragsart)
+				.arg(thema).simplified();
 		if (name.count() > 256)
 		{
-			name = QStringLiteral("%1 %2 %3 %4").arg(ui->titelnummerSpinBox->value(), 2, 10, QLatin1Char('0')).arg(ui->nameLineEdit->text()).arg(ui->beitragsartLineEdit->text())
+			name = QStringLiteral("%1 %2 %3 %4").arg(ui->titelnummerSpinBox->value(), 2, 10, QLatin1Char('0')).arg(nameLineEdit).arg(beitragsart)
 						.arg(ui->bibelstelleLineEdit->text()).simplified();
 			if (name.count() > 256)
 			{
-				name = QStringLiteral("%1 %2 %3").arg(ui->titelnummerSpinBox->value(), 2, 10, QLatin1Char('0')).arg(ui->nameLineEdit->text()).arg(ui->beitragsartLineEdit->text())
+				name = QStringLiteral("%1 %2 %3").arg(ui->titelnummerSpinBox->value(), 2, 10, QLatin1Char('0')).arg(nameLineEdit).arg(beitragsart)
 							.simplified();
 
 				if (name.count() > 256)
@@ -309,7 +349,7 @@ QString Einzelbeitrag::newFileName() const
 		}
 	}
 
-	return name;
+	return Einzelbeitrag::correctForbiddenChars((const QString)name);
 }
 
 void Einzelbeitrag::reReadNames(bool isReadFromServer)
@@ -392,38 +432,67 @@ void Einzelbeitrag::setFileName(const QFileInfo &file)
     }
 }
 
-void Einzelbeitrag::insertId3Tag(const QString& path, const QHash<int,QString>& names)
+bool Einzelbeitrag::insertId3Tag(const QString& path, const QHash<int,QString>& names)
 {
 	int nr = this->ui->titelnummerSpinBox->value();
 	QString fileName = names.value(nr);
-	if (QFile(path + fileName).exists())
-	{
-		QString filePath = path + fileName;
-#ifdef _WIN32
-        TagLib::FileRef tagFile(filePath);
-#else
-        TagLib::FileRef tagFile(filePath.toUtf8().data());
-#endif
-		if ( ! tagFile.isNull() )
-		{
-			TagLib::Tag* tags = tagFile.tag();
-			if (tags != NULL)
-			{
-				QString album = this->parentWindow->getAlbum();
-                tags->setAlbum((this->fileList->getDate().toString("ddd dd.MM.yyyy ") + this->fileList->getDateTime() + " " + album).simplified().toStdWString());
-                tags->setArtist(this->ui->nameLineEdit->text().toStdWString());
-                tags->setTitle((this->art() + " " + this->text() + " " + this->bibelstelle()).simplified().toStdWString());
-                tags->setGenre(this->art().toStdWString());
-				tags->setTrack(this->ui->titelnummerSpinBox->value());
-				tags->setYear(this->fileList->getDate().year());
 
-				if ( ! tagFile.save() )
-				{
-					qDebug("Fehler");
-				}
+	if (fileName.isEmpty())
+	{
+		return true;
+	}
+	if (fileName.endsWith(".wav", Qt::CaseInsensitive))
+	{
+		return true;
+	}
+	if ( ! QFile(path + fileName).exists())
+	{
+		return false;
+	}
+
+	QString filePath = path + fileName;
+
+#ifdef _WIN32
+	TagLib::FileRef tagFile(filePath);
+#else
+	TagLib::FileRef tagFile(filePath.toUtf8().data());
+#endif
+
+	bool isOk = false;
+
+	if ( tagFile.isNull() )
+	{
+		this->log(filePath % " ist null");
+	}
+	else
+	{
+		TagLib::Tag* tags = tagFile.tag();
+		if (tags == NULL)
+		{
+			this->log("tags == NULL");
+		}
+		else
+		{
+			QString album = this->parentWindow->getAlbum();
+			tags->setAlbum((this->fileList->getDate().toString("ddd dd.MM.yyyy ") + this->fileList->getDateTime() + " " + album).simplified().toStdWString());
+			tags->setArtist(this->ui->nameLineEdit->text().toStdWString());
+			tags->setTitle((this->art() + " " + this->text() + " " + this->bibelstelle()).simplified().toStdWString());
+			tags->setGenre(this->art().toStdWString());
+			tags->setTrack(this->ui->titelnummerSpinBox->value());
+			tags->setYear(this->fileList->getDate().year());
+
+			if (tagFile.save())
+			{
+				isOk = true;
+			}
+			else
+			{
+				this->log("Fehler tagFile.save()");
 			}
 		}
 	}
+
+	return isOk;
 }
 
 void Einzelbeitrag::setId3Tag()
@@ -431,12 +500,24 @@ void Einzelbeitrag::setId3Tag()
 	QString path = this->fileList->getPathServer();
 	if ( ! path.isEmpty() )
 	{
-		this->insertId3Tag(path, this->fileList->getDirServer());
+		if ( ! this->insertId3Tag(path, this->fileList->getDirServer()))
+		{
+			QTimer::singleShot(6000, [path, this]()
+			{
+				this->insertId3Tag(path, this->fileList->getDirServer());
+			});
+		}
 	}
 	path = this->fileList->getPathMp3();
 	if ( ! path.isEmpty() )
 	{
-		this->insertId3Tag(path, this->fileList->getDirLocal());
+		if ( ! this->insertId3Tag(path, this->fileList->getDirLocal()))
+		{
+			QTimer::singleShot(6000, [path, this]()
+			{
+				this->insertId3Tag(path, this->fileList->getDirLocal());
+			});
+		}
 	}
 }
 
