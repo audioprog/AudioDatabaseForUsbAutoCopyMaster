@@ -155,6 +155,8 @@ private:
 	MainWindow* parentWindow;
 
 	QTimer* timerUpdate;
+
+	QElapsedTimer id3Time;
 };
 
 #endif // EINZELBEITRAG_H

@@ -63,7 +63,10 @@ MainWindow::MainWindow(QWidget *parent) :
     db.setDatabaseName("audio");
     db.setUserName("audio");
     db.setPassword("1udio");
-    db.open();
+	if ( ! db.open())
+	{
+		qDebug(db.lastError().text().toLatin1());
+	}
 
 	ui->dateEdit->blockSignals(true);
     ui->dateEdit->setDate(QDate::currentDate());
@@ -1444,13 +1447,17 @@ QString MainWindow::detCopyCenterSubPath(const QDate& date, const QString& dayTi
 				{
 					midString = "a";
 				}
-				else if (dayTime.startsWith('N', Qt::CaseInsensitive))
+				else if (dayTime.startsWith('Z', Qt::CaseInsensitive))
 				{
 					midString = "b";
 				}
-				else
+				else if (dayTime.startsWith('N', Qt::CaseInsensitive))
 				{
 					midString = "c";
+				}
+				else
+				{
+					midString = "d";
 				}
 			}
             else if (midString == "d")

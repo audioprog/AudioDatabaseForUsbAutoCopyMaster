@@ -265,7 +265,7 @@ void Einzelbeitrag::intUpdateState(QLabel* label, eState& curState, const QStrin
 			QStringList test = filenames.filter(QRegExp(regStr));
 			test << filenames.filter(QRegExp(QStringLiteral("^0*%1 .+").arg(this->titelNr())));
 			test << filenames.filter(QRegExp(QStringLiteral("^Tit[le][el]0*%1[^0-9]").arg(this->titelNr())));
-			test << filenames.filter(QRegExp(QStringLiteral("^0*%1\..*").arg(this->titelNr())));
+			test << filenames.filter(QRegExp(QStringLiteral("^0*%1\\..*").arg(this->titelNr())));
 			test << filenames.filter(QRegExp(QStringLiteral("^wav0*%1[^0-9].*").arg(this->titelNr())));
 
 			test.removeDuplicates();
@@ -317,19 +317,19 @@ QString Einzelbeitrag::newFileName() const
 	QString beitragsart = this->getBeitragsart();
 	QString thema = Einzelbeitrag::correctForbiddenChars(ui->themaLineEdit->text());
 
-	QString name = QStringLiteral("%1 %2 %3 %4 %5").arg(ui->titelnummerSpinBox->value(), 2, 10, QLatin1Char('0')).arg(nameLineEdit).arg(beitragsart)
+	QString name = QStringLiteral("%1 %2_%3_%4 %5").arg(ui->titelnummerSpinBox->value(), 2, 10, QLatin1Char('0')).arg(nameLineEdit).arg(beitragsart)
 			.arg(thema).arg(Einzelbeitrag::correctForbiddenChars(ui->bibelstelleLineEdit->text())).simplified();
 	if (name.count() > 256)
 	{
-		name = QStringLiteral("%1 %2 %3 %4").arg(ui->titelnummerSpinBox->value(), 2, 10, QLatin1Char('0')).arg(nameLineEdit).arg(beitragsart)
+		name = QStringLiteral("%1 %2_%3_%4").arg(ui->titelnummerSpinBox->value(), 2, 10, QLatin1Char('0')).arg(nameLineEdit).arg(beitragsart)
 				.arg(thema).simplified();
 		if (name.count() > 256)
 		{
-			name = QStringLiteral("%1 %2 %3 %4").arg(ui->titelnummerSpinBox->value(), 2, 10, QLatin1Char('0')).arg(nameLineEdit).arg(beitragsart)
+			name = QStringLiteral("%1 %2_%3_%4").arg(ui->titelnummerSpinBox->value(), 2, 10, QLatin1Char('0')).arg(nameLineEdit).arg(beitragsart)
 						.arg(ui->bibelstelleLineEdit->text()).simplified();
 			if (name.count() > 256)
 			{
-				name = QStringLiteral("%1 %2 %3").arg(ui->titelnummerSpinBox->value(), 2, 10, QLatin1Char('0')).arg(nameLineEdit).arg(beitragsart)
+				name = QStringLiteral("%1 %2_%3").arg(ui->titelnummerSpinBox->value(), 2, 10, QLatin1Char('0')).arg(nameLineEdit).arg(beitragsart)
 							.simplified();
 
 				if (name.count() > 256)
@@ -401,11 +401,25 @@ void Einzelbeitrag::reRead()
 		}
 	}
 
-	rest = this->findBestMatch(rest, bible, ui->bibelstelleLineEdit);
+	if (fileName[0] >= '0' && fileName[0] <= '9' && fileName.count('_') > 1)
+	{
+		int u1 = rest.indexOf('_');
+		ui->nameLineEdit->setText(rest.left(u1).simplified());
+		rest = rest.mid(u1 + 1);
+		u1 = rest.indexOf('_');
+		ui->beitragsartLineEdit->setText(rest.left(u1).simplified());
+		rest = rest.mid(u1 + 1);
 
-	rest = this->findBestMatch(rest, names, ui->nameLineEdit);
+		rest = this->findBestMatch(rest, bible, ui->bibelstelleLineEdit);
+	}
+	else
+	{
+		rest = this->findBestMatch(rest, bible, ui->bibelstelleLineEdit);
 
-	rest = this->findBestMatch(rest, types, ui->beitragsartLineEdit);
+		rest = this->findBestMatch(rest, names, ui->nameLineEdit);
+
+		rest = this->findBestMatch(rest, types, ui->beitragsartLineEdit);
+	}
 
 	rest = rest.remove(QRegExp("\\( *\\)")).simplified();
 
@@ -476,7 +490,7 @@ bool Einzelbeitrag::insertId3Tag(const QString& path, const QHash<int,QString>& 
 			QString album = this->parentWindow->getAlbum();
 			tags->setAlbum((this->fileList->getDate().toString("ddd dd.MM.yyyy ") + this->fileList->getDateTime() + " " + album).simplified().toStdWString());
 			tags->setArtist(this->ui->nameLineEdit->text().toStdWString());
-			tags->setTitle((this->art() + " " + this->text() + " " + this->bibelstelle()).simplified().toStdWString());
+			tags->setTitle((QString::number(this->ui->titelnummerSpinBox->value()) + " " + this->ui->nameLineEdit->text() + " " + this->art() + " " + this->text() + " " + this->bibelstelle()).simplified().toStdWString());
 			tags->setGenre(this->art().toStdWString());
 			tags->setTrack(this->ui->titelnummerSpinBox->value());
 			tags->setYear(this->fileList->getDate().year());
@@ -592,24 +606,30 @@ void Einzelbeitrag::slotUpdateStates()
 	QString mp3FilePath = this->intUpdateState(this->stateLocal, ui->labelMp3, this->fileList->getDirLocal(), titleNr, rightFileName, this->fileList->getPathMp3());
 	QString serverFilePath = this->intUpdateState(this->stateServer, ui->labelServer, this->fileList->getDirServer(), titleNr, rightFileName, this->fileList->getPathServer());
 
+	if (this->id3Time.isValid() && this->id3Time.elapsed() < 10000)
+	{
+		return;
+	}
+
+	QString propertyFilePath = filePath;
 	if (filePath.isEmpty())
 	{
 		if (mp3FilePath.isEmpty())
 		{
-			filePath = serverFilePath;
+			propertyFilePath = serverFilePath;
 		}
 		else
 		{
-			filePath = mp3FilePath;
+			propertyFilePath = mp3FilePath;
 		}
 	}
 
-	if ( ! filePath.isEmpty())
+	if ( ! propertyFilePath.isEmpty())
 	{
 #ifdef _WIN32
-        TagLib::FileRef tagFile(filePath);
+		TagLib::FileRef tagFile(propertyFilePath);
 #else
-        TagLib::FileRef tagFile(filePath.toUtf8().data());
+		TagLib::FileRef tagFile(propertyFilePath.toUtf8().data());
 #endif
         if ( ! tagFile.isNull() )
 		{
@@ -623,6 +643,55 @@ void Einzelbeitrag::slotUpdateStates()
 			}
 		}
 	}
+
+	QString id3FilePath = filePath;
+	if ( ! mp3FilePath.isEmpty())
+	{
+		id3FilePath = mp3FilePath;
+	}
+	else if ( ! serverFilePath.isEmpty())
+	{
+		id3FilePath = serverFilePath;
+	}
+
+	if ( ! id3FilePath.isEmpty())
+	{
+#ifdef _WIN32
+		TagLib::FileRef tagFile(id3FilePath);
+#else
+		TagLib::FileRef tagFile(id3FilePath.toUtf8().data());
+#endif
+		if ( ! tagFile.isNull() )
+		{
+			TagLib::AudioProperties* propertys = tagFile.audioProperties();
+			if (propertys != NULL)
+			{
+				int seconds = propertys->length();
+				QTime time(0,0,0);
+				time = time.addSecs(seconds);
+				ui->labelTime->setText(QStringLiteral("Zeit: %1").arg(time.toString("h:mm:ss")));
+			}
+			if ( ! tagFile.tag()->isEmpty())
+			{
+				TagLib::Tag* tags = tagFile.tag();
+				QString album = (this->fileList->getDate().toString("ddd dd.MM.yyyy ") + this->fileList->getDateTime() + " " + this->parentWindow->getAlbum()).simplified();
+				QString tagalbum = tags->album().toQString();
+				QString tagartist = tags->artist().toQString();
+				QString tagtitle = tags->title().toQString();
+				QString taggenre = tags->genre().toQString();
+				bool isSame = tagalbum == album;
+				isSame = isSame && tagartist == this->ui->nameLineEdit->text();
+				isSame = isSame && tagtitle == (QString::number(this->ui->titelnummerSpinBox->value()) + " " + this->ui->nameLineEdit->text() + " " + this->art() + " " + this->text() + " " + this->bibelstelle()).simplified();
+				isSame = isSame && taggenre == this->art();
+				isSame = isSame && tags->track() == this->ui->titelnummerSpinBox->value();
+				isSame = isSame && tags->year() == this->fileList->getDate().year();
+
+				ui->toolButtonSetId3Tag->setStyleSheet(isSame ? "background: green" : "background: red");
+			}
+		}
+	}
+
+	this->id3Time.restart();
 }
 
 QString Einzelbeitrag::text() const
