@@ -120,6 +120,14 @@ namespace TagLib {
     virtual uint track() const = 0;
 
     /*!
+     * Returns the album interpret
+     */
+    virtual String albumInterpret() const
+    {
+        return String();
+    }
+
+    /*!
      * Sets the title to \a s.  If \a s is String::null then this value will be
      * cleared.
      */
@@ -161,6 +169,12 @@ namespace TagLib {
      * Sets the track to \a i.  If \a s is 0 then this value will be cleared.
      */
     virtual void setTrack(uint i) = 0;
+
+    /*!
+     * Sets the composer
+     */
+    virtual void setAlbumInterpret(const String &s)
+    {}
 
     /*!
      * Returns true if the tag does not contain any data.  This should be

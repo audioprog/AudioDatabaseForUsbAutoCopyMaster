@@ -317,22 +317,38 @@ QString Einzelbeitrag::newFileName() const
 	QString beitragsart = this->getBeitragsart();
 	QString thema = Einzelbeitrag::correctForbiddenChars(ui->themaLineEdit->text());
 
-	QString name = QStringLiteral("%1 %2_%3_%4 %5").arg(ui->titelnummerSpinBox->value(), 2, 10, QLatin1Char('0')).arg(nameLineEdit).arg(beitragsart)
+    QString name = QStringLiteral("%1 %3 - %2 - %4 %5").arg(ui->titelnummerSpinBox->value(), 2, 10, QLatin1Char('0')).arg(nameLineEdit).arg(beitragsart)
 			.arg(thema).arg(Einzelbeitrag::correctForbiddenChars(ui->bibelstelleLineEdit->text())).simplified();
+    if (name.endsWith(" -"))
+    {
+        name.chop(2);
+    }
 	if (name.count() > 256)
 	{
-		name = QStringLiteral("%1 %2_%3_%4").arg(ui->titelnummerSpinBox->value(), 2, 10, QLatin1Char('0')).arg(nameLineEdit).arg(beitragsart)
+        name = QStringLiteral("%1 %3 - %2 - %4").arg(ui->titelnummerSpinBox->value(), 2, 10, QLatin1Char('0')).arg(nameLineEdit).arg(beitragsart)
 				.arg(thema).simplified();
-		if (name.count() > 256)
+        if (name.endsWith(" -"))
+        {
+            name.chop(2);
+        }
+        if (name.count() > 256)
 		{
-			name = QStringLiteral("%1 %2_%3_%4").arg(ui->titelnummerSpinBox->value(), 2, 10, QLatin1Char('0')).arg(nameLineEdit).arg(beitragsart)
+            name = QStringLiteral("%1 %3 - %2 - %4").arg(ui->titelnummerSpinBox->value(), 2, 10, QLatin1Char('0')).arg(nameLineEdit).arg(beitragsart)
 						.arg(ui->bibelstelleLineEdit->text()).simplified();
-			if (name.count() > 256)
+            if (name.endsWith(" -"))
+            {
+                name.chop(2);
+            }
+            if (name.count() > 256)
 			{
-				name = QStringLiteral("%1 %2_%3").arg(ui->titelnummerSpinBox->value(), 2, 10, QLatin1Char('0')).arg(nameLineEdit).arg(beitragsart)
+                name = QStringLiteral("%1 %3 - %2").arg(ui->titelnummerSpinBox->value(), 2, 10, QLatin1Char('0')).arg(nameLineEdit).arg(beitragsart)
 							.simplified();
+                if (name.endsWith(" -"))
+                {
+                    name.chop(2);
+                }
 
-				if (name.count() > 256)
+                if (name.count() > 256)
 				{
 					QRegExp regExp("[\\D\\W]");
 					while (name.count() > 256)
@@ -412,7 +428,26 @@ void Einzelbeitrag::reRead()
 
 		rest = this->findBestMatch(rest, bible, ui->bibelstelleLineEdit);
 	}
-	else
+    else if (fileName[0] >= '0' && fileName[0] <= '9' && fileName.count('-') > 1)
+    {
+        int u1 = rest.indexOf('-');
+        ui->beitragsartLineEdit->setText(rest.left(u1).simplified());
+        rest = rest.mid(u1 + 1);
+        u1 = rest.indexOf('-');
+        ui->nameLineEdit->setText(rest.left(u1).simplified());
+        rest = rest.mid(u1 + 1);
+
+        rest = this->findBestMatch(rest, bible, ui->bibelstelleLineEdit);
+    }
+    else if (fileName[0] >= '0' && fileName[0] <= '9' && fileName.count('-') == 1)
+    {
+        int u1 = rest.indexOf('-');
+        ui->beitragsartLineEdit->setText(rest.left(u1).simplified());
+        rest = rest.mid(u1 + 1);
+        ui->nameLineEdit->setText(rest.simplified());
+        rest.clear();
+    }
+    else
 	{
 		rest = this->findBestMatch(rest, bible, ui->bibelstelleLineEdit);
 
@@ -490,10 +525,11 @@ bool Einzelbeitrag::insertId3Tag(const QString& path, const QHash<int,QString>& 
 			QString album = this->parentWindow->getAlbum();
 			tags->setAlbum((this->fileList->getDate().toString("ddd dd.MM.yyyy ") + this->fileList->getDateTime() + " " + album).simplified().toStdWString());
 			tags->setArtist(this->ui->nameLineEdit->text().toStdWString());
-			tags->setTitle((QString::number(this->ui->titelnummerSpinBox->value()) + " " + this->ui->nameLineEdit->text() + " " + this->art() + " " + this->text() + " " + this->bibelstelle()).simplified().toStdWString());
+            tags->setTitle((QString::number(this->ui->titelnummerSpinBox->value()) + " " + this->art() + " " + this->ui->nameLineEdit->text() + " " + this->text() + " " + this->bibelstelle()).simplified().toStdWString());
 			tags->setGenre(this->art().toStdWString());
 			tags->setTrack(this->ui->titelnummerSpinBox->value());
 			tags->setYear(this->fileList->getDate().year());
+            tags->setAlbumInterpret("Evangelische Baptistengemeinde e.V. Altenkirchen");
 
 			if (tagFile.save())
 			{
@@ -681,7 +717,7 @@ void Einzelbeitrag::slotUpdateStates()
 				QString taggenre = tags->genre().toQString();
 				bool isSame = tagalbum == album;
 				isSame = isSame && tagartist == this->ui->nameLineEdit->text();
-				isSame = isSame && tagtitle == (QString::number(this->ui->titelnummerSpinBox->value()) + " " + this->ui->nameLineEdit->text() + " " + this->art() + " " + this->text() + " " + this->bibelstelle()).simplified();
+                isSame = isSame && tagtitle == (QString::number(this->ui->titelnummerSpinBox->value()) + " " + this->art() + " " + this->ui->nameLineEdit->text() + " " + this->text() + " " + this->bibelstelle()).simplified();
 				isSame = isSame && taggenre == this->art();
 				isSame = isSame && tags->track() == this->ui->titelnummerSpinBox->value();
 				isSame = isSame && tags->year() == this->fileList->getDate().year();

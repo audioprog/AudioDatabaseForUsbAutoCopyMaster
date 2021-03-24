@@ -134,7 +134,12 @@ uint TagUnion::year() const
 
 uint TagUnion::track() const
 {
-  numberUnion(track);
+    numberUnion(track);
+}
+
+String TagUnion::albumInterpret() const
+{
+    stringUnion(albumInterpret);
 }
 
 void TagUnion::setTitle(const String &s)
@@ -169,7 +174,12 @@ void TagUnion::setYear(uint i)
 
 void TagUnion::setTrack(uint i)
 {
-  setUnion(Track, i);
+    setUnion(Track, i);
+}
+
+void TagUnion::setAlbumInterpret(const String &s)
+{
+    setUnion(AlbumInterpret, s);
 }
 
 bool TagUnion::isEmpty() const

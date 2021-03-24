@@ -93,6 +93,53 @@ namespace TagLib {
      *   <li><b>TSSE</b> Software/Hardware and settings used for encoding</li>
      *   <li><b>TSST</b> Set subtitle</li>
      * </ul>
+     * <ul>
+     * <li><b>TALB</b> Album/Film/Show-Titel</li>
+     * <li><b>TBPM</b> BPM (Beats per Minute)</li>
+     * <li><b>TCOM</b> Komponist</li>
+     * <li><b>TCON</b> Inhaltstyp</li>
+     * <li><b>TCOP</b> Copyright-Meldung</li>
+     * <li><b>TDEN</b> Kodierungszeit</li>
+     * <li><b>TDLY</b> Verzögerung der Wiedergabeliste</li>
+     * <li><b>TDOR</b> Ursprüngliche Freigabezeit</li>
+     * <li><b>TDRC</b> Aufnahmezeit</li>
+     * <li><b>TDRL</b> Freigabezeit</li>
+     * <li><b>TDTG</b> Markierungszeit</li>
+     * <li><b>TENC</b> Kodiert von</li>
+     * <li><b>TEXT</b> Texter/Textschreiber</li>
+     * <li><b>TFLT</b> Dateityp</li>
+     * <li><b>TIPL</b> Liste beteiligter Personen</li>
+     * <li><b>TIT1</b> Beschreibung der Inhaltsgruppe</li>
+     * <li><b>TIT2</b> Titel/Songname/Inhalt</li>
+     * <li><b>TIT3</b> Untertitel/Beschreibung verfeinern</li>
+     * <li><b>TKEY</b> Anfangsschlüssel</li>
+     * <li><b>TLAN</b> Sprache(n)</li>
+     * <li><b>TLEN</b> Länge</li>
+     * <li><b>TMCL</b> Liste der Musiker-Credits</li>
+     * <li><b>TMED</b> Medientyp</li>
+     * <li><b>TMOO</b> Stimmung</li>
+     * <li><b>TOAL</b> Original-Album/Film/Show-Titel</li>
+     * <li><b>TOFN</b> Original Dateiname</li>
+     * <li><b>TOLY</b> Original-Lyriker/Textschreiber</li>
+     * <li><b>TOPE</b> Original-Interpret(en)/Darsteller</li>
+     * <li><b>TOWN</b> Dateieigentümer/Lizenznehmer</li>
+     * <li><b>TPE1</b> Hauptinterpret(en)/Solist(en)</li>
+     * <li><b>TPE2</b> Band/Orchester/Begleitung</li>
+     * <li><b>TPE3</b> Dirigent/Darsteller Veredelung</li>
+     * <li><b>TPE4</b> Interpretiert, neu abgemischt oder anderweitig verändert von</li>
+     * <li><b>TPOS</b> Teil eines Sets</li>
+     * <li><b>TPRO</b> Produziert nach</li>
+     * <li><b>TPUB</b> Herausgeber</li>
+     * <li><b>TRCK</b> Titelnummer/Position im Set</li>
+     * <li><b>TRSN</b> Name des Internet-Radiosenders</li>
+     * <li><b>TRSO</b> Besitzer der Internet-Radiostation</li>
+     * <li><b>TSOA</b> Album-Sortierreihenfolge</li>
+     * <li><b>TSOP</b> Interpreten-Sortierreihenfolge</li>
+     * <li><b>TSOT</b> Titel-Sortierreihenfolge</li>
+     * <li><b>TSRC</b> ISRC (International Standard Recording Code)</li>
+     * <li><b>TSSE</b> Für die Codierung verwendete Software/Hardware und Einstellungen</li>
+     * <li><b>TSST</b> Untertitel einstellen</li>
+     * </ul>
      *
      * The ID3v2 Frames document gives a description of each of these formats
      * and the expected order of strings in each.  ID3v2::Header::frameID() can

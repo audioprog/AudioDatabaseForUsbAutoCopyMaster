@@ -222,6 +222,13 @@ uint ID3v2::Tag::track() const
   return 0;
 }
 
+String ID3v2::Tag::albumInterpret() const
+{
+  if(!d->frameListMap["TPE2"].isEmpty())
+    return d->frameListMap["TPE2"].front()->toString();
+  return String::null;
+}
+
 void ID3v2::Tag::setTitle(const String &s)
 {
   setTextFrame("TIT2", s);
@@ -295,6 +302,16 @@ void ID3v2::Tag::setTrack(uint i)
     return;
   }
   setTextFrame("TRCK", String::number(i));
+}
+
+void ID3v2::Tag::setAlbumInterpret(const String &s)
+{
+  if(s.isEmpty()) {
+    removeFrames("TPE2");
+    return;
+  }
+
+  setTextFrame("TPE2", s);
 }
 
 bool ID3v2::Tag::isEmpty() const
