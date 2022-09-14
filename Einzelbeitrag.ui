@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>621</width>
-    <height>215</height>
+    <height>281</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -136,35 +136,25 @@
      <item>
       <widget class="QToolButton" name="toolButtonSetId3Tag">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="autoFillBackground">
-        <bool>true</bool>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">background: red;</string>
-       </property>
-       <property name="text">
-        <string>ID3</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="labelServer">
        <property name="maximumSize">
         <size>
          <width>16777215</width>
          <height>30</height>
         </size>
        </property>
+       <property name="autoFillBackground">
+        <bool>false</bool>
+       </property>
        <property name="styleSheet">
         <string notr="true">background: red;</string>
        </property>
        <property name="text">
-        <string>Server</string>
+        <string>ID3</string>
        </property>
       </widget>
      </item>

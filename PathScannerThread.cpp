@@ -135,12 +135,12 @@ void PathScannerThread::run()
 
 	recursiveSearch(QFileInfo(this->baseDir));
 
-	QHash<QDate,SDirInfo> newDateHash;
+    QMultiHash<QDate,SDirInfo> newDateHash;
 	if ( ! this->isInterruptionRequested())
 	{
 		foreach (const SDirInfo& item, this->dateSDirInfoList)
 		{
-			newDateHash.insertMulti(item.date, item);
+            newDateHash.insert(item.date, item);
 		}
 	}
 

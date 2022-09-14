@@ -10,6 +10,8 @@
 #include "lsMp3Converter.h"
 #include "mainwindow.h"
 
+#include <QRegExp>
+
 Einzelbeitrag::Einzelbeitrag(MainWindow* parentWindow, QWidget *parent) :
     QWidget(parent),
 	ui(new Ui::Einzelbeitrag),
@@ -262,11 +264,11 @@ void Einzelbeitrag::intUpdateState(QLabel* label, eState& curState, const QStrin
 		else
 		{
 			QString regStr = QStringLiteral("^0*%1[^0-9].* ").arg(this->titelNr());
-			QStringList test = filenames.filter(QRegExp(regStr));
-			test << filenames.filter(QRegExp(QStringLiteral("^0*%1 .+").arg(this->titelNr())));
-			test << filenames.filter(QRegExp(QStringLiteral("^Tit[le][el]0*%1[^0-9]").arg(this->titelNr())));
-			test << filenames.filter(QRegExp(QStringLiteral("^0*%1\\..*").arg(this->titelNr())));
-			test << filenames.filter(QRegExp(QStringLiteral("^wav0*%1[^0-9].*").arg(this->titelNr())));
+            QStringList test = filenames.filter(QRegularExpression(regStr));
+            test << filenames.filter(QRegularExpression(QStringLiteral("^0*%1 .+").arg(this->titelNr())));
+            test << filenames.filter(QRegularExpression(QStringLiteral("^Tit[le][el]0*%1[^0-9]").arg(this->titelNr())));
+            test << filenames.filter(QRegularExpression(QStringLiteral("^0*%1\\..*").arg(this->titelNr())));
+            test << filenames.filter(QRegularExpression(QStringLiteral("^wav0*%1[^0-9].*").arg(this->titelNr())));
 
 			test.removeDuplicates();
 
@@ -350,7 +352,7 @@ QString Einzelbeitrag::newFileName() const
 
                 if (name.count() > 256)
 				{
-					QRegExp regExp("[\\D\\W]");
+                    QRegularExpression regExp("[\\D\\W]");
 					while (name.count() > 256)
 					{
 						int oldLen = name.count();
@@ -456,7 +458,7 @@ void Einzelbeitrag::reRead()
 		rest = this->findBestMatch(rest, types, ui->beitragsartLineEdit);
 	}
 
-	rest = rest.remove(QRegExp("\\( *\\)")).simplified();
+    rest = rest.remove(QRegularExpression("\\( *\\)")).simplified();
 
 	if (rest.startsWith(QStringLiteral("(")) && rest.endsWith(QStringLiteral(")")))
 	{
@@ -523,7 +525,7 @@ bool Einzelbeitrag::insertId3Tag(const QString& path, const QHash<int,QString>& 
 		else
 		{
 			QString album = this->parentWindow->getAlbum();
-			tags->setAlbum((this->fileList->getDate().toString("ddd dd.MM.yyyy ") + this->fileList->getDateTime() + " " + album).simplified().toStdWString());
+            tags->setAlbum((QLocale().toString(this->fileList->getDate(), "ddd dd.MM.yyyy ") + this->fileList->getDateTime() + " " + album).simplified().toStdWString());
 			tags->setArtist(this->ui->nameLineEdit->text().toStdWString());
             tags->setTitle((QString::number(this->ui->titelnummerSpinBox->value()) + " " + this->art() + " " + this->ui->nameLineEdit->text() + " " + this->text() + " " + this->bibelstelle()).simplified().toStdWString());
 			tags->setGenre(this->art().toStdWString());
@@ -640,7 +642,6 @@ void Einzelbeitrag::slotUpdateStates()
 
 	QString filePath = this->intUpdateState(this->stateCapture, ui->labelLocal, this->fileList->getDirCapture(), titleNr, rightFileName, this->fileList->getPathCapture());
 	QString mp3FilePath = this->intUpdateState(this->stateLocal, ui->labelMp3, this->fileList->getDirLocal(), titleNr, rightFileName, this->fileList->getPathMp3());
-	QString serverFilePath = this->intUpdateState(this->stateServer, ui->labelServer, this->fileList->getDirServer(), titleNr, rightFileName, this->fileList->getPathServer());
 
 	if (this->id3Time.isValid() && this->id3Time.elapsed() < 10000)
 	{
@@ -650,14 +651,7 @@ void Einzelbeitrag::slotUpdateStates()
 	QString propertyFilePath = filePath;
 	if (filePath.isEmpty())
 	{
-		if (mp3FilePath.isEmpty())
-		{
-			propertyFilePath = serverFilePath;
-		}
-		else
-		{
-			propertyFilePath = mp3FilePath;
-		}
+        propertyFilePath = mp3FilePath;
 	}
 
 	if ( ! propertyFilePath.isEmpty())
@@ -685,10 +679,6 @@ void Einzelbeitrag::slotUpdateStates()
 	{
 		id3FilePath = mp3FilePath;
 	}
-	else if ( ! serverFilePath.isEmpty())
-	{
-		id3FilePath = serverFilePath;
-	}
 
 	if ( ! id3FilePath.isEmpty())
 	{
@@ -710,7 +700,7 @@ void Einzelbeitrag::slotUpdateStates()
 			if ( ! tagFile.tag()->isEmpty())
 			{
 				TagLib::Tag* tags = tagFile.tag();
-				QString album = (this->fileList->getDate().toString("ddd dd.MM.yyyy ") + this->fileList->getDateTime() + " " + this->parentWindow->getAlbum()).simplified();
+                QString album = (QLocale().toString(this->fileList->getDate(), "ddd dd.MM.yyyy ") + this->fileList->getDateTime() + " " + this->parentWindow->getAlbum()).simplified();
 				QString tagalbum = tags->album().toQString();
 				QString tagartist = tags->artist().toQString();
 				QString tagtitle = tags->title().toQString();

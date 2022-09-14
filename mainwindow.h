@@ -3,7 +3,7 @@
 
 #include <QMainWindow>
 
-#include <QMediaContent>
+//#include <QMediaContent>
 #include <QtSql>
 
 class QMediaPlayer;

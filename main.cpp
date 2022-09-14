@@ -11,6 +11,8 @@ int main(int argc, char *argv[])
 	a.setOrganizationName("Leonhard Suckau");
 	a.setOrganizationDomain("AudioDatenbank");
 
+    QLocale::setDefault(QLocale::system());
+
 	MainWindow w;
     w.show();
 

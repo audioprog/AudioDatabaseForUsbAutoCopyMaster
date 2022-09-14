@@ -16,7 +16,6 @@
 #include <QDesktopServices>
 #include <QFileDialog>
 #include <QFileSystemWatcher>
-#include <QMediaContent>
 #include <QMediaPlayer>
 #include <QMessageBox>
 #include <QProgressBar>
@@ -278,7 +277,7 @@ void MainWindow::createEinzelbeitragItems()
 			QHash<int,QString> titles = this->fetchTitlesOfPath();
 
 			QList<int> titleList = titles.keys();
-			qSort(titleList);
+            std::sort(titleList.begin(), titleList.end());
 
 			foreach (int title, titleList)
 			{
@@ -304,7 +303,7 @@ void MainWindow::createMediaPlayer()
 		delete this->mediaPlayer;
 	}
 	this->mediaPlayer = new QMediaPlayer(this);
-	this->mediaPlayer->setVolume(100);
+    //this->mediaPlayer->setVolume(100);
 //	connect(this->mediaPlayer, &QMediaPlayer::mediaChanged, this, &MainWindow::slotNewTitle);
 	connect(this->mediaPlayer, &QMediaPlayer::durationChanged, this->progressBar, &QProgressBar::setMaximum);
 	connect(this->mediaPlayer, &QMediaPlayer::positionChanged, this->progressBar, &QProgressBar::setValue);
@@ -427,7 +426,7 @@ QString MainWindow::findPathOfDate() const
 QString MainWindow::findPathOfDateAtPathScanner(PathScannerThread* pathScanner) const
 {
 	QString path;
-	QList<PathScannerThread::SDirInfo> list = pathScanner->hashDateDirInfo.values(ui->dateEdit->date());
+    QList<PathScannerThread::SDirInfo> list = pathScanner->hashDateDirInfo.values(ui->dateEdit->date());
 	QString test = ui->comboBoxZeit->currentText().toLower();
 	QString startTest = test.left(1);
 
@@ -561,9 +560,9 @@ QStringList MainWindow::detFileNameOfTitle(const QString& fullPath, int titleNr)
 		if ( ! filenames.isEmpty())
 		{
 			QString regStr = QStringLiteral("^0*%1[^0-9].* ").arg(titleNr);
-			QStringList test = filenames.filter(QRegExp(regStr));
-			test << filenames.filter(QRegExp(QStringLiteral("^0*%1 .+").arg(titleNr)));
-			test << filenames.filter(QRegExp(QStringLiteral("^Tit[le][el] *0*%1[^0-9]").arg(titleNr)));
+            QStringList test = filenames.filter(QRegularExpression(regStr));
+            test << filenames.filter(QRegularExpression(QStringLiteral("^0*%1 .+").arg(titleNr)));
+            test << filenames.filter(QRegularExpression(QStringLiteral("^Tit[le][el] *0*%1[^0-9]").arg(titleNr)));
 
 			test.removeDuplicates();
 
@@ -579,7 +578,7 @@ void MainWindow::slotDirChanged(QString dir)
 	QHash<int,QString> titles = this->fetchTitlesOfPath(dir);
 
 	QList<int> titleList = titles.keys();
-	qSort(titleList);
+    std::sort(titleList.begin(), titleList.end());
 
 	foreach (int title, titleList)
 	{
@@ -614,7 +613,7 @@ void MainWindow::slotPlayTitle(QString fileName)
 	path += fileName;
 
 	this->createMediaPlayer();
-	this->mediaPlayer->setMedia(QUrl::fromLocalFile(path));
+    this->mediaPlayer->setSource(QUrl::fromLocalFile(path));
 	this->mediaPlayer->play();
 }
 
@@ -652,15 +651,18 @@ void MainWindow::slotRename(Einzelbeitrag* toRename)
 
 	if ( ! newFileName.isEmpty())
 	{
-		toRename->setFileName(newFileName);
+        QFileInfo newName(newFileName);
+        toRename->setFileName(newName);
 	}
 	else if ( ! newMp3FileName.isEmpty())
-	{
-		toRename->setFileName(newMp3FileName);
+    {
+        QFileInfo newName(newMp3FileName);
+        toRename->setFileName(newName);
 	}
 	else if ( ! newCapFileName.isEmpty())
-	{
-		toRename->setFileName(newCapFileName);
+    {
+        QFileInfo newName(newCapFileName);
+        toRename->setFileName(newName);
 	}
 }
 
@@ -692,14 +694,14 @@ QString MainWindow::slotRenameInPath(QString path, Einzelbeitrag* toRename, QStr
 	if ( ! filenames.isEmpty())
 	{
 		QString regStr = QStringLiteral("^0*%1[^0-9].* ").arg(toRename->titelNr());
-		QStringList test = filenames.filter(QRegExp(regStr));
-		test << filenames.filter(QRegExp(QStringLiteral("^0*%1 .+").arg(toRename->titelNr())));
-		test << filenames.filter(QRegExp(QStringLiteral("^Tit[le][el] *0*%1[^0-9]").arg(toRename->titelNr())));
+        QStringList test = filenames.filter(QRegularExpression(regStr));
+        test << filenames.filter(QRegularExpression(QStringLiteral("^0*%1 .+").arg(toRename->titelNr())));
+        test << filenames.filter(QRegularExpression(QStringLiteral("^Tit[le][el] *0*%1[^0-9]").arg(toRename->titelNr())));
 
 		test.removeDuplicates();
 
-		QStringList oldWave = test.filter(QRegExp(".[Ww][Aa][Vv]$"));
-		QStringList oldMp3 = test.filter(QRegExp(".[Mm][Pp]3"));
+        QStringList oldWave = test.filter(QRegularExpression(".[Ww][Aa][Vv]$"));
+        QStringList oldMp3 = test.filter(QRegularExpression(".[Mm][Pp]3"));
 
 		QString newName;
 
@@ -902,8 +904,9 @@ void MainWindow::setTitleNr(Einzelbeitrag* einzel, const QHash<int,QString>& fil
 		if (path.endsWith('/') == false)
 		{
 			path += "/";
-		}
-		einzel->setFileName(path + fileHash.value(titleNr));
+        }
+        QFileInfo newName(path + fileHash.value(titleNr));
+        einzel->setFileName(newName);
 	}
 }
 
@@ -998,7 +1001,7 @@ void MainWindow::on_actionStop_triggered()
 	if (this->mediaPlayer != NULL)
 	{
 		this->mediaPlayer->stop();
-		this->mediaPlayer->setMedia(QMediaContent());
+        this->mediaPlayer->setSource(QUrl());
 		delete this->mediaPlayer;
 		this->mediaPlayer = NULL;
 	}
@@ -1297,9 +1300,9 @@ void MainWindow::on_actionWorte_triggered()
 	if (query.exec(queryStr))
 	{
 		QString regExpStr = QString("[A-Za-zÄÖÜäöüß]{%1,}").arg(minCount);
-		QRegExp regexp(regExpStr);
+        QRegularExpression regexp(regExpStr);
 
-		QRegExp regexpSplit("[^A-Za-zÄÖÜäöüß]");
+        QRegularExpression regexpSplit("[^A-Za-zÄÖÜäöüß]");
 
 		while (query.next())
 		{
@@ -1457,7 +1460,7 @@ QString MainWindow::detCopyCenterSubPath(const QDate& date, const QString& dayTi
 				}
 				else
 				{
-					midString = "d";
+                    midString = "c";
 				}
 			}
             else if (midString == "d")

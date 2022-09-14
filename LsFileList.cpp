@@ -1,6 +1,8 @@
 #include "LsFileList.h"
 
 #include <QDir>
+#include <QRegExp>
+#include <QRegularExpression>
 
 #include "lsGlobalSettings.h"
 
@@ -73,7 +75,7 @@ QList<int> LsFileList::nrsCapture()
 	QList<int> toReturn = this->dirCapture.keys();
 	this->mutexDirCapture.unlock();
 
-	qSort(toReturn);
+    std::sort(toReturn.begin(), toReturn.end());
 
 	return toReturn;
 }
@@ -84,7 +86,7 @@ QList<int> LsFileList::nrsLocal()
 	QList<int> toReturn = this->dirLocal.keys();
 	this->mutexDirLocal.unlock();
 
-	qSort(toReturn);
+    std::sort(toReturn.begin(), toReturn.end());
 
 	return toReturn;
 }
@@ -95,7 +97,7 @@ QList<int> LsFileList::nrsServer()
 	QList<int> toReturn = this->dirServer.keys();
 	this->mutexDirServer.unlock();
 
-	qSort(toReturn);
+    std::sort(toReturn.begin(), toReturn.end());
 
 	return toReturn;
 }
@@ -202,7 +204,7 @@ QString LsFileList::fillDirHash(QHash<int,QString>& fileNrHash, QMutex& mutexDir
 
 	QStringList fileList = QDir(path).entryList(QStringList(QStringLiteral("*.mp3")) << QStringLiteral("*.wav"), QDir::Files);
 
-	QRegExp regex(".*(\\d+)\\D.*");
+    QRegExp regex(".*(\\d+)\\D.*");
 
 	QHash<int,QString> fileHash;
 

@@ -27,7 +27,7 @@ public:
 
 	QString baseDir;
 
-	QHash<QDate,SDirInfo> hashDateDirInfo;
+    QMultiHash<QDate,SDirInfo> hashDateDirInfo;
 
 protected:
 	SDirInfo dateFromPath( const QString& path ) const;

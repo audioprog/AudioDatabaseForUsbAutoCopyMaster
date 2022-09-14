@@ -6,6 +6,7 @@
 
 #include <QDir>
 #include <QProcess>
+#include <QRegExp>
 
 lsMp3Converter::lsMp3Converter(lsGlobalSettings* globalSettings, QObject* parent) : QObject(parent), globalSettings(globalSettings)
 {
@@ -13,7 +14,7 @@ lsMp3Converter::lsMp3Converter(lsGlobalSettings* globalSettings, QObject* parent
 	this->proc = new QProcess(this);
 	this->proc->setProcessChannelMode(QProcess::MergedChannels);
 	connect(this->proc, &QProcess::readyRead, this, &lsMp3Converter::slotProcOutput);
-    connect(this->proc, QOverload<int>::of(&QProcess::finished), this, &lsMp3Converter::slotFinished);
+    connect(this->proc, qOverload<int,QProcess::ExitStatus>(&QProcess::finished), this, &lsMp3Converter::slotFinished);
 }
 
 lsMp3Converter::~lsMp3Converter()
