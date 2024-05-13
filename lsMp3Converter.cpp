@@ -108,9 +108,8 @@ void lsMp3Converter::slotFinished()
 			cpath += QStringLiteral("/");
 		}
 
-		QString mp3Path = this->globalSettings->mp3Path();
-		QString serverPath = this->globalSettings->serverPath();
-		if (mp3Path.isEmpty() && serverPath.isEmpty())
+        QString mp3Path = this->globalSettings->mp3Path();
+        if (mp3Path.isEmpty())
 		{
 			if ( ! this->queue.isEmpty())
 			{
@@ -119,11 +118,7 @@ void lsMp3Converter::slotFinished()
 			return;
 		}
 
-		QString tarPath = mp3Path;
-		if (tarPath.isEmpty())
-		{
-			tarPath = serverPath;
-		}
+        QString tarPath = mp3Path;
 
 		if ( ! tarPath.endsWith('/'))
 		{

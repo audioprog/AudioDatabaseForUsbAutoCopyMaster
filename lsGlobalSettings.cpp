@@ -47,7 +47,6 @@ void lsGlobalSettings::load()
 	QSettings settings;
 	settings.beginGroup(QStringLiteral("Global"));
 
-	ui->lineEditServerPath->setText(settings.value(QStringLiteral("Serverpath"), QStringLiteral("S:")).toString());
 	ui->lineEditMp3Path->setText(settings.value(QStringLiteral("Mp3Path"), QStringLiteral("D:/MP3")).toString());
 	ui->lineEditCapturePath->setText(settings.value(QStringLiteral("CapturePath"), QStringLiteral("E:/Gottesdienste Aufnahme")).toString());
 	ui->lineEditCopyCenter->setText(settings.value(QStringLiteral("CopyCenterServicePath")).toString());
@@ -68,7 +67,6 @@ void lsGlobalSettings::save()
 	QSettings settings;
 	settings.beginGroup(QStringLiteral("Global"));
 
-	settings.setValue(QStringLiteral("Serverpath"), ui->lineEditServerPath->text());
 	settings.setValue(QStringLiteral("Mp3Path"), ui->lineEditMp3Path->text());
 	settings.setValue(QStringLiteral("CapturePath"), ui->lineEditCapturePath->text());
 	settings.setValue(QStringLiteral("CopyCenterServicePath"), ui->lineEditCopyCenter->text());
@@ -77,12 +75,6 @@ void lsGlobalSettings::save()
 	settings.endGroup();
 }
 
-QString lsGlobalSettings::serverPath()
-{
-	if (self == NULL) { return QStringLiteral(""); }
-
-	return self->ui->lineEditServerPath->text();
-}
 
 QString lsGlobalSettings::subPath(const QDate& date)
 {
@@ -127,20 +119,11 @@ void lsGlobalSettings::on_toolButtonMp3Path_clicked()
 	}
 }
 
-void lsGlobalSettings::on_toolButtonServerPath_clicked()
-{
-	QString path = QFileDialog::getExistingDirectory(this, QStringLiteral("Serverpfad"), ui->lineEditServerPath->text());
-	if ( ! path.isEmpty())
-	{
-		ui->lineEditServerPath->setText(path);
-	}
-}
-
 void lsGlobalSettings::on_toolButtonCopyCenter_clicked()
 {
-	QString path = QFileDialog::getExistingDirectory(this, QStringLiteral("CopyCenter"), ui->lineEditServerPath->text());
-	if ( ! path.isEmpty())
-	{
-		ui->lineEditCopyCenter->setText(path);
-	}
+    QString path = QFileDialog::getExistingDirectory(this, QStringLiteral("CopyCenter"), ui->lineEditCopyCenter->text());
+    if ( ! path.isEmpty())
+    {
+        ui->lineEditCopyCenter->setText(path);
+    }
 }

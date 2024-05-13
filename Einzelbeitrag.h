@@ -101,9 +101,7 @@ signals:
 
     void signalAddNextTo( Einzelbeitrag* );
 
-	void signalPlay( QString fileName );
-
-	void signalSync( Einzelbeitrag* );
+    void signalPlay( QString fileName );
 
 private slots:
 
@@ -119,9 +117,7 @@ private slots:
 
 	void on_toolButtonRename_clicked();
 
-	void on_toolButtonReread_clicked();
-
-	void on_buttonSync_clicked();
+    void on_toolButtonReread_clicked();
 
 	void on_toolButtonSetId3Tag_clicked();
 

@@ -46,10 +46,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
 	this->progressBar = new QProgressBar(this);
-	this->ui->statusBar->addWidget(this->progressBar);
-
-	this->serverPathScanner = new PathScannerThread(this);
-	connect(this->serverPathScanner, &PathScannerThread::finished, this, &MainWindow::slotDateScannerFinished);
+    this->ui->statusBar->addWidget(this->progressBar);
 
 	this->mp3PathScanner = new PathScannerThread(this);
 	connect(this->mp3PathScanner, &PathScannerThread::finished, this, &MainWindow::slotDateScannerFinished);
@@ -57,8 +54,8 @@ MainWindow::MainWindow(QWidget *parent) :
 	this->capturePathScanner = new PathScannerThread(this);
 	connect(this->capturePathScanner, &PathScannerThread::finished, this, &MainWindow::slotDateScannerFinished);
 
-	this->db = QSqlDatabase::addDatabase("QMYSQL", "audiodb");
-	this->db.setHostName("nas-bbh");
+    this->db = QSqlDatabase::addDatabase("QMYSQL", "audio");
+    this->db.setHostName("192.168.178.11");
     db.setDatabaseName("audio");
     db.setUserName("audio");
     db.setPassword("1udio");
@@ -109,13 +106,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	QSettings settings;
 	restoreGeometry(settings.value("geometry").toByteArray());
-	restoreState(settings.value("windowState").toByteArray());
-
-	this->serverPathScanner->baseDir = lsGlobalSettings::serverPath();
-	if (this->serverPathScanner->baseDir.isEmpty() == false && QDir(this->serverPathScanner->baseDir).exists())
-	{
-		this->serverPathScanner->start();
-	}
+    restoreState(settings.value("windowState").toByteArray());
 
 	this->mp3PathScanner->baseDir = lsGlobalSettings::mp3Path();
 	if ( ! this->mp3PathScanner->baseDir.isEmpty() && QDir(this->mp3PathScanner->baseDir).exists())
@@ -164,15 +155,13 @@ void MainWindow::addConnections(Einzelbeitrag* einzel)
 	disconnect(einzel, &Einzelbeitrag::signalRemoveThis, this,&MainWindow::slotRemoveMe);
 	disconnect(einzel, &Einzelbeitrag::signalRename, this,&MainWindow::slotRename);
 	disconnect(einzel, &Einzelbeitrag::signalAddNextTo, this, &MainWindow::slotAddAtMe);
-	disconnect(einzel, &Einzelbeitrag::signalPlay, this, &MainWindow::slotPlayTitle);
-	disconnect(einzel, &Einzelbeitrag::signalSync, this, &MainWindow::slotSyncMp3);
+    disconnect(einzel, &Einzelbeitrag::signalPlay, this, &MainWindow::slotPlayTitle);
 
 	connect(einzel, &Einzelbeitrag::signalConvertToMp3, this, &MainWindow::slotConvertToMp3);
 	connect(einzel, &Einzelbeitrag::signalRemoveThis, this,&MainWindow::slotRemoveMe);
 	connect(einzel, &Einzelbeitrag::signalRename, this,&MainWindow::slotRename);
 	connect(einzel, &Einzelbeitrag::signalAddNextTo, this, &MainWindow::slotAddAtMe);
-	connect(einzel, &Einzelbeitrag::signalPlay, this, &MainWindow::slotPlayTitle);
-	connect(einzel, &Einzelbeitrag::signalSync, this, &MainWindow::slotSyncMp3);
+    connect(einzel, &Einzelbeitrag::signalPlay, this, &MainWindow::slotPlayTitle);
 
 	einzel->setAutoCompleteDatabase(this->db);
 }
@@ -359,15 +348,7 @@ qlonglong MainWindow::detMaxBeitragId(QSqlDatabase* db)
 QString MainWindow::detSubPath() const
 {
 	QString path = ui->labelPath->text();
-	if (path.startsWith(lsGlobalSettings::serverPath()))
-	{
-		path = path.mid(lsGlobalSettings::serverPath().count());
-		if (path.startsWith('/'))
-		{
-			path = path.mid(1);
-		}
-	}
-	else if (path.startsWith(lsGlobalSettings::mp3Path()))
+    if (path.startsWith(lsGlobalSettings::mp3Path()))
 	{
 		path = path.mid(lsGlobalSettings::mp3Path().count());
 		if (path.startsWith('/'))
@@ -407,10 +388,6 @@ QString MainWindow::findPathOfDate() const
 {
 	QString path;
 
-	if (this->serverPathScanner->hashDateDirInfo.contains(ui->dateEdit->date()))
-	{
-		path = this->findPathOfDateAtPathScanner(this->serverPathScanner);
-	}
 	if (path.isEmpty() && this->mp3PathScanner->hashDateDirInfo.contains(ui->dateEdit->date()))
 	{
 		path = this->findPathOfDateAtPathScanner(this->mp3PathScanner);
@@ -503,11 +480,11 @@ void MainWindow::slotConvertToMp3(Einzelbeitrag* toConvert)
 
 void MainWindow::slotDateScannerFinished()
 {
-	if (this->serverPathScanner == NULL) { return; }
+    if (this->mp3PathScanner == NULL) { return; }
 
-	if (this->serverPathScanner->hashDateDirInfo.contains(ui->dateEdit->date()))
+    if (this->mp3PathScanner->hashDateDirInfo.contains(ui->dateEdit->date()))
 	{
-		QList<PathScannerThread::SDirInfo> list = this->serverPathScanner->hashDateDirInfo.values(ui->dateEdit->date());
+        QList<PathScannerThread::SDirInfo> list = this->mp3PathScanner->hashDateDirInfo.values(ui->dateEdit->date());
 		QString test = ui->comboBoxZeit->currentText().toLower();
 		QString startTest = test.left(1);
 
@@ -641,20 +618,13 @@ void MainWindow::slotRename(Einzelbeitrag* toRename)
 	if (preSubPath.isEmpty() == false && ! preSubPath.endsWith('/'))
 	{
 		preSubPath += "/";
-	}
-
-	QString newFileName = this->slotRenameInPath(this->ui->globalSettings->serverPath(), toRename, preSubPath, subpath);
+    }
 
 	QString newMp3FileName = this->slotRenameInPath(this->ui->globalSettings->mp3Path(), toRename, preSubPath, subpath);
 
 	QString newCapFileName = this->slotRenameInPath(this->ui->globalSettings->capturePath(), toRename, preSubPath, subpath);
 
-	if ( ! newFileName.isEmpty())
-	{
-        QFileInfo newName(newFileName);
-        toRename->setFileName(newName);
-	}
-	else if ( ! newMp3FileName.isEmpty())
+    if ( ! newMp3FileName.isEmpty())
     {
         QFileInfo newName(newMp3FileName);
         toRename->setFileName(newName);
@@ -730,44 +700,6 @@ QString MainWindow::slotRenameInPath(QString path, Einzelbeitrag* toRename, QStr
 	}
 
 	return returnFileName;
-}
-
-void MainWindow::slotSyncMp3(Einzelbeitrag* toSync)
-{
-	QString path = this->ui->globalSettings->serverPath();
-	QString fullPath = this->detFullPath(path);
-
-	if ( ! fullPath.isEmpty())
-	{
-		QStringList oldNames = this->detFileNameOfTitle(fullPath, toSync->titelNr());
-
-		QString srcPath = this->detFullPath(this->ui->globalSettings->mp3Path());
-
-		if ( ! srcPath.isEmpty())
-		{
-			QStringList srcNames = this->detFileNameOfTitle(srcPath, toSync->titelNr());
-
-			if (srcNames.count() == 1)
-			{
-				foreach (const QString& name, oldNames)
-				{
-					QDir(fullPath).remove(name);
-				}
-
-				QString newName = toSync->newFileName();
-				newName += "." + srcNames.first().section('.', -1, -1);
-				if (newName != srcNames.first())
-				{
-					QFile(srcPath + "/" + srcNames.first()).rename(newName);
-				}
-				if ( ! QDir(fullPath).exists())
-				{
-					QDir(fullPath).mkpath(fullPath);
-				}
-				QFile(srcPath + "/" + newName).copy(fullPath + "/" + newName);
-			}
-		}
-	}
 }
 
 void MainWindow::slotTableViewSelectChanged(const QModelIndex& index, const QModelIndex&)
@@ -847,17 +779,7 @@ QHash<int, QString> MainWindow::fetchTitlesOfPath(const QString& dir)
 	}
 	else
 	{
-		QString basePath = ui->globalSettings->serverPath();
-		if ( ! basePath.isEmpty())
-		{
-			QString path = this->detFullPath(basePath);
-			if (QDir(path).exists())
-			{
-				fileHash = this->fetchTitlesOfPath(path);
-			}
-		}
-
-		basePath = ui->globalSettings->mp3Path();
+        QString basePath = ui->globalSettings->mp3Path();
 		if ( ! basePath.isEmpty())
 		{
 			path = this->detFullPath(basePath);
@@ -912,7 +834,7 @@ void MainWindow::setTitleNr(Einzelbeitrag* einzel, const QHash<int,QString>& fil
 
 bool MainWindow::updateBeschreibungFromDb(const QDate &date, const QString& selecteTime)
 {
-    QSqlDatabase db = QSqlDatabase::database("audiodb");
+    QSqlDatabase db = QSqlDatabase::database(dbName);
     QSqlQuery query(db);
 
     qlonglong id = -1;
@@ -929,7 +851,7 @@ bool MainWindow::updateBeschreibungFromDb(const QDate &date, const QString& sele
             QString beschreibung = query.record().value("Beschreibung").toString();
 			if (path.isEmpty() == false)
 			{
-				QString startpath = lsGlobalSettings::serverPath();
+                QString startpath = lsGlobalSettings::mp3Path();
 				if (startpath.endsWith('/') == false)
 				{
 					startpath += "/";
@@ -1009,7 +931,7 @@ void MainWindow::on_actionStop_triggered()
 
 void MainWindow::on_actionSpeichern_triggered()
 {
-	QSqlDatabase db = QSqlDatabase::database("audiodb");
+    QSqlDatabase db = QSqlDatabase::database(dbName);
 
 	QSqlQuery gottesdiensteQuery(db);
 
@@ -1110,6 +1032,7 @@ void MainWindow::on_actionSpeichern_triggered()
 		QSqlQuery insertQuery(db);
 		if (insertQuery.exec(insert) == false)
 		{
+            auto err = db.lastError();
 			ui->statusBar->showMessage("Fehler beim Hinzufügen.");
 		}
 		else
@@ -1137,7 +1060,11 @@ void MainWindow::updateFileWatcher()
 {
 	this->fileList->changeCurrent(this->detSubPath(), ui->dateEdit->date(), ui->comboBoxZeit->currentText());
 
-	this->fileWatcher->removePaths(this->fileWatcher->directories());
+    auto list = this->fileWatcher->directories();
+    if (!list.empty())
+    {
+        this->fileWatcher->removePaths(list);
+    }
 
 	if (this->capturePathScanner->hashDateDirInfo.contains(ui->dateEdit->date()))
 	{
@@ -1169,7 +1096,7 @@ QStringList MainWindow::searchNewWords(const QString& tableName, const QStringLi
 {
 	QStringList newWordList;
 
-	QSqlDatabase db = QSqlDatabase::database("audiodb");
+    QSqlDatabase db = QSqlDatabase::database(dbName);
 
 	QSqlQuery query(db);
 
@@ -1259,7 +1186,7 @@ void MainWindow::slotAddNewWords(QStringList newWordList)
 	QString exportColumnName = "Word";
 	const QString& columnName = exportColumnName;
 
-	QSqlDatabase db = QSqlDatabase::database("audiodb");
+    QSqlDatabase db = QSqlDatabase::database(dbName);
 
 	QSqlQuery query(db);
 
@@ -1291,7 +1218,7 @@ void MainWindow::on_actionWorte_triggered()
 
 	QStringList words;
 
-	QSqlDatabase db = QSqlDatabase::database("audiodb");
+    QSqlDatabase db = QSqlDatabase::database(dbName);
 
 	QSqlQuery query(db);
 
@@ -1490,6 +1417,10 @@ QString MainWindow::detCopyCenterSubPath(const QDate& date, const QString& dayTi
                     break;
                 }
             }
+            else if (midString == "t")
+            {
+                midString = ui->comboBoxZeit->currentText();
+            }
 			else
 			{
 				midString = date.toString(midString);
@@ -1516,18 +1447,6 @@ bool MainWindow::copyToCopyCenter(const QDate& date, const QString& dayTime, boo
         {
             srcPath = item.path;
             break;
-        }
-    }
-
-    if (srcPath.isEmpty())
-    {
-        QList<PathScannerThread::SDirInfo> slist = this->serverPathScanner->hashDateDirInfo.values(date);
-        for (const PathScannerThread::SDirInfo& item : slist)
-        {
-            if (item.dayTime == dayTime)
-            {
-                srcPath = item.path;
-            }
         }
     }
 
@@ -1600,7 +1519,7 @@ bool MainWindow::copyToCopyCenter(const QDate& date, const QString& dayTime, boo
 				}
 				QFile file(tarPath + dayTime + ".txt");
 				file.open(QFile::WriteOnly);
-				file.write("AudioDatabase");
+                file.write("");
 				file.close();
 
 				return true;
@@ -1642,3 +1561,9 @@ void MainWindow::on_actionAlles_kopieren_triggered()
 		this->copyToCopyCenter(date, dayTime);
 	}
 }
+
+void MainWindow::on_comboBoxZeit_currentIndexChanged(int index)
+{
+   on_comboBoxZeit_currentIndexChanged("");
+}
+

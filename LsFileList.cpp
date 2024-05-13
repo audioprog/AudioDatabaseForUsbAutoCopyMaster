@@ -33,11 +33,7 @@ void LsFileList::changeCurrent(const QString& subPath, const QDate& newDate, con
 
 	this->mutexDirLocal.lock();
 	this->dirLocal.clear();
-	this->mutexDirLocal.unlock();
-
-	this->mutexDirServer.lock();
-	this->dirServer.clear();
-	this->mutexDirServer.unlock();
+    this->mutexDirLocal.unlock();
 
 
 	this->mutexGlobalData.lock();
@@ -85,17 +81,6 @@ QList<int> LsFileList::nrsLocal()
 	this->mutexDirLocal.lock();
 	QList<int> toReturn = this->dirLocal.keys();
 	this->mutexDirLocal.unlock();
-
-    std::sort(toReturn.begin(), toReturn.end());
-
-	return toReturn;
-}
-
-QList<int> LsFileList::nrsServer()
-{
-	this->mutexDirServer.lock();
-	QList<int> toReturn = this->dirServer.keys();
-	this->mutexDirServer.unlock();
 
     std::sort(toReturn.begin(), toReturn.end());
 
@@ -194,8 +179,7 @@ void LsFileList::renameInt(QMutex& mutexDir, QHash<int,QString>& dirHash, const 
 void LsFileList::rename(int titleNr, const QString& newFileName)
 {
 	this->renameInt(this->mutexDirCapture, this->dirCapture,  this->globalSettings->capturePath(), titleNr, newFileName);
-	this->renameInt(this->mutexDirLocal, this->dirLocal, this->globalSettings->mp3Path(), titleNr, newFileName);
-	this->renameInt(this->mutexDirServer, this->dirServer, this->globalSettings->serverPath(), titleNr, newFileName);
+    this->renameInt(this->mutexDirLocal, this->dirLocal, this->globalSettings->mp3Path(), titleNr, newFileName);
 }
 
 QString LsFileList::fillDirHash(QHash<int,QString>& fileNrHash, QMutex& mutexDir, QString basePath)
@@ -228,8 +212,7 @@ void LsFileList::run()
 	while ( ! this->isInterruptionRequested() && this->globalSettings)
 	{
 		this->pathCapture = this->fillDirHash(this->dirCapture, this->mutexDirCapture, this->globalSettings->capturePath());
-		this->pathMp3 = this->fillDirHash(this->dirLocal, this->mutexDirLocal, this->globalSettings->mp3Path());
-		this->pathServer = this->fillDirHash(this->dirServer, this->mutexDirServer, this->globalSettings->serverPath());
+        this->pathMp3 = this->fillDirHash(this->dirLocal, this->mutexDirLocal, this->globalSettings->mp3Path());
 		emit signalReadingFinished();
 		sleep(5);
 	}

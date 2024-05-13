@@ -80,9 +80,7 @@ private slots:
 
     void slotRemoveMe( Einzelbeitrag* toDelete );
 
-	void slotRename(Einzelbeitrag* toRename);
-
-	void slotSyncMp3(Einzelbeitrag* toSync);
+    void slotRename(Einzelbeitrag* toRename);
 
 	void slotTableViewSelectChanged(const QModelIndex &current, const QModelIndex &previous);
 
@@ -125,6 +123,8 @@ private slots:
 
 	void on_actionAlles_kopieren_triggered();
 
+    void on_comboBoxZeit_currentIndexChanged(int index);
+
 private:
 
 	void addConnections(Einzelbeitrag* einzel);
@@ -147,6 +147,9 @@ private:
 
 	bool updateBeschreibungFromDb(const QDate &date, const QString &selecteTime);
 
+public:
+    const char* dbName = "audio";
+
 private:
     Ui::MainWindow *ui;
 
@@ -155,8 +158,6 @@ private:
 	QFileSystemWatcher* fileWatcher;
 
     QMediaPlayer*   mediaPlayer;
-
-	PathScannerThread* serverPathScanner;
 
 	PathScannerThread* mp3PathScanner;
 

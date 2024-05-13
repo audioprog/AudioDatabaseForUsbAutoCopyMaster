@@ -549,18 +549,7 @@ bool Einzelbeitrag::insertId3Tag(const QString& path, const QHash<int,QString>& 
 
 void Einzelbeitrag::setId3Tag()
 {
-	QString path = this->fileList->getPathServer();
-	if ( ! path.isEmpty() )
-	{
-		if ( ! this->insertId3Tag(path, this->fileList->getDirServer()))
-		{
-			QTimer::singleShot(6000, [path, this]()
-			{
-				this->insertId3Tag(path, this->fileList->getDirServer());
-			});
-		}
-	}
-	path = this->fileList->getPathMp3();
+    QString path = this->fileList->getPathMp3();
 	if ( ! path.isEmpty() )
 	{
 		if ( ! this->insertId3Tag(path, this->fileList->getDirLocal()))
@@ -593,9 +582,7 @@ void Einzelbeitrag::slotMp3ConvertFinished(lsMp3Converter* converter)
 	ui->comboBoxFileName->clear();
 	ui->comboBoxFileName->addItem(fileName);
 	ui->comboBoxFileName->setCurrentIndex(0);
-	ui->progressBar->setValue(0);
-
-	emit signalSync(this);
+    ui->progressBar->setValue(0);
 }
 
 QString Einzelbeitrag::intUpdateState(eState& curState, QLabel* label, QHash<int,QString> files, int titleNr, QString rightFileName, const QString& path)
@@ -761,11 +748,6 @@ void Einzelbeitrag::on_toolButtonRename_clicked()
 void Einzelbeitrag::on_toolButtonReread_clicked()
 {
 	this->reRead();
-}
-
-void Einzelbeitrag::on_buttonSync_clicked()
-{
-	emit signalSync(this);
 }
 
 void Einzelbeitrag::on_toolButtonSetId3Tag_clicked()

@@ -36,9 +36,7 @@ public:
 private slots:
 	void on_toolButtonCapturePath_clicked();
 
-	void on_toolButtonMp3Path_clicked();
-
-	void on_toolButtonServerPath_clicked();
+    void on_toolButtonMp3Path_clicked();
 
     void on_toolButtonCopyCenter_clicked();
 

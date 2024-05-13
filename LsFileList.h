@@ -31,18 +31,14 @@ public:
 	const QString& getDateTime() const { return this->dateTime; }
 
 	QHash<int,QString> getDirCapture() { QMutexLocker locker(&this->mutexDirCapture); return this->dirCapture; }
-	QHash<int,QString> getDirLocal() { QMutexLocker locker(&this->mutexDirLocal); return this->dirLocal; }
-	QHash<int,QString> getDirServer() { QMutexLocker locker(&this->mutexDirServer); return this->dirServer; }
+    QHash<int,QString> getDirLocal() { QMutexLocker locker(&this->mutexDirLocal); return this->dirLocal; }
 
 	const QString& getPathCapture() const { return this->pathCapture; }
-	const QString& getPathMp3() const { return this->pathMp3; }
-	const QString& getPathServer() const { return this->pathServer; }
+    const QString& getPathMp3() const { return this->pathMp3; }
 
 	QList<int> nrsCapture();
 
-	QList<int> nrsLocal();
-
-	QList<int> nrsServer();
+    QList<int> nrsLocal();
 
 	void rename( int titleNr, const QString& newFileName );
 
@@ -60,10 +56,7 @@ private:
 	QHash<int,QString> dirCapture;
 
 	QMutex mutexDirLocal;
-	QHash<int,QString> dirLocal;
-
-	QMutex mutexDirServer;
-	QHash<int,QString> dirServer;
+    QHash<int,QString> dirLocal;
 
 private:
 	QMutex mutexGlobalData;
@@ -72,8 +65,7 @@ private:
 	QString subPath;
 
 	QString pathCapture;
-	QString pathMp3;
-	QString pathServer;
+    QString pathMp3;
 
 	lsGlobalSettings* globalSettings;
 };

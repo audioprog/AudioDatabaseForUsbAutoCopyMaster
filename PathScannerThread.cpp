@@ -60,11 +60,20 @@ PathScannerThread::SDirInfo PathScannerThread::dateFromPath(const QString& path)
 		toInterpret = toInterpret.mid(index + 10);
 	}
 	toInterpret = toInterpret.section('/', -1, -1);
-	regexp.setPattern("^[^A-Za-z]*");
-	if (regexp.indexIn(toInterpret) == 0)
-	{
-		toInterpret = toInterpret.mid(regexp.capturedTexts().first().length()).simplified();
-	}
+    regexp.setPattern("^(?: ?[MDFS][oira]) [a-z] (.*)");
+    if (regexp.indexIn(toInterpret) == 0)
+    {
+        auto texts = regexp.capturedTexts();
+        toInterpret = texts.last().simplified();
+    }
+    else
+    {
+        regexp.setPattern("^[^A-Za-z]*");
+        if (regexp.indexIn(toInterpret) == 0)
+        {
+            toInterpret = toInterpret.mid(regexp.capturedTexts().first().length()).simplified();
+        }
+    }
 
 	SDirInfo toReturn;
 	toReturn.date = toReturnDate;

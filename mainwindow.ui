@@ -16,7 +16,7 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>AudioDatenbank 0.3</string>
+   <string>AudioDatenbank 0.4</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -188,8 +188,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>946</width>
-             <height>280</height>
+             <width>948</width>
+             <height>312</height>
             </rect>
            </property>
           </widget>
@@ -308,7 +308,7 @@
      <x>0</x>
      <y>0</y>
      <width>954</width>
-     <height>33</height>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuDatenbankpflege">
