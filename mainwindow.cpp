@@ -668,6 +668,11 @@ QString MainWindow::slotRenameInPath(QString path, Einzelbeitrag* toRename, QStr
         test << filenames.filter(QRegularExpression(QStringLiteral("^0*%1 .+").arg(toRename->titelNr())));
         test << filenames.filter(QRegularExpression(QStringLiteral("^Tit[le][el] *0*%1[^0-9]").arg(toRename->titelNr())));
 
+        if (test.count() == 0)
+        {
+            test << filenames.filter(QRegularExpression(QStringLiteral("^0*%1\\.[WwMm][AaPp][Vv3]$").arg(toRename->titelNr())));
+        }
+
 		test.removeDuplicates();
 
         QStringList oldWave = test.filter(QRegularExpression(".[Ww][Aa][Vv]$"));
@@ -675,6 +680,15 @@ QString MainWindow::slotRenameInPath(QString path, Einzelbeitrag* toRename, QStr
 
 		QString newName;
 
+        if (oldWave.count() > 1)
+        {
+            test.clear();
+            test << oldWave.filter(QRegularExpression(QStringLiteral("^0*%1 .+").arg(toRename->titelNr())));
+            if (test.count() == 1)
+            {
+                oldWave = test;
+            }
+        }
 		if (oldWave.count() == 1)
 		{
 			newName = toRename->newFileName();

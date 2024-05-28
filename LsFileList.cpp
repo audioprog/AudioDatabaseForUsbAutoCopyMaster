@@ -196,7 +196,11 @@ QString LsFileList::fillDirHash(QHash<int,QString>& fileNrHash, QMutex& mutexDir
 	{
 		if (regex.indexIn(file) > -1 && (file.startsWith(QStringLiteral("Tit")) || file.contains(QLatin1Char(' '))))
 		{
-			fileHash[regex.cap(1).toInt()] = file;
+            int nr = regex.cap(1).toInt();
+            if ((!fileHash.contains(nr)) || fileHash[nr].startsWith("Tit"))
+            {
+                fileHash[nr] = file;
+            }
 		}
 	}
 
