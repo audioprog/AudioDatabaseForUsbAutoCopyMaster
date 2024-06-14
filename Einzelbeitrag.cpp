@@ -578,6 +578,10 @@ void Einzelbeitrag::slotMp3ConvertFinished(lsMp3Converter* converter)
 	disconnect(converter, &lsMp3Converter::signalProgress, this, &Einzelbeitrag::slotMp3Progress);
 
 	QString fileName = ui->comboBoxFileName->currentText();
+    if (fileName == ".mp3")
+    {
+        fileName = newFileName() + ".mp3";
+    }
 	fileName = fileName.section('.', 0, -2) + ".mp3";
 	ui->comboBoxFileName->clear();
 	ui->comboBoxFileName->addItem(fileName);

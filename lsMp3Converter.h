@@ -1,6 +1,7 @@
 #ifndef LSMP3CONVERTER_H
 #define LSMP3CONVERTER_H
 
+#include "qprocess.h"
 #include <QObject>
 
 #include <QPointer>
@@ -30,7 +31,7 @@ public:
 	void setSubPath( const QString& newSubPath ) { this->subPath = newSubPath; }
 
 private slots:
-	void slotFinished();
+    void slotFinished(int code, QProcess::ExitStatus exitStatus);
 
 	void slotProcOutput();
 

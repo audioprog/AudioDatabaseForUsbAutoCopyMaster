@@ -46,13 +46,13 @@ bool lsMp3Converter::convert(Einzelbeitrag* toConvert, const QDate& date)
 
 	if ( ! this->isProcessing)
 	{
-		this->slotFinished();
+        this->slotFinished(0, QProcess::NormalExit);
 	}
 
 	return true;
 }
 
-void lsMp3Converter::slotFinished()
+void lsMp3Converter::slotFinished(int code, QProcess::ExitStatus exitStatus)
 {
 	if (this->isProcessing && ! this->currentProcessing.isNull())
 	{
@@ -70,11 +70,11 @@ void lsMp3Converter::slotFinished()
 
 		QPair<QPointer<Einzelbeitrag>,QDate> pair = this->queue.dequeue();
 
-		Einzelbeitrag* toConvert = pair.first.data();
-		if (NULL == toConvert) { if ( ! this->queue.isEmpty()) { this->slotFinished(); } return; }
+        Einzelbeitrag* toConvert = pair.first.data();
+        if (NULL == toConvert) { if ( ! this->queue.isEmpty()) { this->slotFinished(0, QProcess::NormalExit); } return; }
 
 		const QDate& date = pair.second;
-		if (date.isNull() || ! date.isValid()) { if ( ! this->queue.isEmpty()) { this->slotFinished(); } return; }
+        if (date.isNull() || ! date.isValid()) { if ( ! this->queue.isEmpty()) { this->slotFinished(0, QProcess::NormalExit); } return; }
 
 		connect(this, &lsMp3Converter::signalProgress, toConvert, &Einzelbeitrag::slotMp3Progress);
 		connect(this, &lsMp3Converter::signalFinished, toConvert, &Einzelbeitrag::slotMp3ConvertFinished);
@@ -84,7 +84,7 @@ void lsMp3Converter::slotFinished()
 		{
 			if ( ! this->queue.isEmpty())
 			{
-				this->slotFinished();
+                this->slotFinished(0, QProcess::NormalExit);
 			}
 			return;
 		}
@@ -112,8 +112,8 @@ void lsMp3Converter::slotFinished()
         if (mp3Path.isEmpty())
 		{
 			if ( ! this->queue.isEmpty())
-			{
-				this->slotFinished();
+            {
+                this->slotFinished(0, QProcess::NormalExit);
 			}
 			return;
 		}
@@ -148,6 +148,11 @@ void lsMp3Converter::slotFinished()
 		}
 
 		QString fileName = toConvert->fileName();
+        if (fileName.isEmpty())
+        {
+            fileName = toConvert->newFileName() + ".mp3";
+            toConvert->setFileName(QFileInfo(tarPath + fileName));
+        }
 
 		QStringList params;
 		params << QStringLiteral("-b") << QStringLiteral("192") << QStringLiteral("--cbr");
@@ -157,7 +162,8 @@ void lsMp3Converter::slotFinished()
 
 		this->currentProcessing = toConvert;
 
-        this->proc->start("\"C:/Program Files (x86)/lame/lame.exe\" " + params.join(" ").replace("/", "\\"));
+        QString command = "\"C:/Program Files (x86)/lame/lame.exe\" " + params.join(" ").replace("/", "\\");
+        this->proc->start(command);
 	}
 }
 
@@ -173,6 +179,6 @@ void lsMp3Converter::slotProcOutput()
 			emit signalProgress(percent);
 		}
 	}
-//	qDebug(text.toLatin1().constData());
+    qDebug(text.toLatin1().constData());
 }
 

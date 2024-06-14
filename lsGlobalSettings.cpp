@@ -59,6 +59,15 @@ QString lsGlobalSettings::mp3Path()
 {
 	if (self == NULL) { return QStringLiteral(""); }
 
+    QString path = self->ui->lineEditMp3Path->text();
+    if (path.isEmpty())
+    {
+        QSettings settings;
+        settings.beginGroup(QStringLiteral("Global"));
+
+        self->ui->lineEditMp3Path->setText(settings.value(QStringLiteral("Mp3Path"), QStringLiteral("D:/MP3")).toString());
+    }
+
 	return self->ui->lineEditMp3Path->text();
 }
 
