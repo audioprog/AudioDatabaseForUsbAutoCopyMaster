@@ -114,9 +114,15 @@ int PathScannerThread::detDirSize(const QString& path) const
 bool PathScannerThread::recursiveSearch(const QFileInfo& infoItem)
 {
 	QFileInfoList infoList = QDir(infoItem.absoluteFilePath()).entryInfoList(QDir::AllDirs | QDir::NoDotAndDotDot);
+	int subDirCount = 0;
 	foreach (const QFileInfo& item, infoList)
 	{
 		if (this->isInterruptionRequested()) { return true; }
+
+		// Hilfsordner der Aufnahmesoftware, keine eigene Aufnahme
+		if (item.fileName().compare(QStringLiteral("marker"), Qt::CaseInsensitive) == 0) { continue; }
+
+		subDirCount++;
 
 		if ( ! recursiveSearch(item))
 		{
@@ -132,7 +138,7 @@ bool PathScannerThread::recursiveSearch(const QFileInfo& infoItem)
 			}
 		}
 	}
-	return infoList.count();
+	return subDirCount > 0;
 }
 
 void PathScannerThread::run()

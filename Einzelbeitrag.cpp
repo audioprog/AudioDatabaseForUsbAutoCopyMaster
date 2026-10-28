@@ -89,7 +89,7 @@ QString Einzelbeitrag::bibelstelle() const
 
 void Einzelbeitrag::correctForbiddenChars(QString& toCorrect)
 {
-	QString forbidden("\\/:?\"<>|+*'");
+    QString forbidden("\\/:?\"<>|+*'„“");
 	for (const QChar& forbiddenChar : forbidden)
 	{
 		toCorrect.replace(forbiddenChar, ' ');
@@ -100,7 +100,7 @@ void Einzelbeitrag::correctForbiddenChars(QString& toCorrect)
 QString Einzelbeitrag::correctForbiddenChars(const QString& rawFileName)
 {
 	QString toCorrect = rawFileName;
-	QString forbidden("\\/:?\"<>|+*'&");
+    QString forbidden("\\/:?\"<>|+*'„“&");
 	for (const QChar& forbiddenChar : forbidden)
 	{
 		toCorrect.replace(forbiddenChar, ' ');
@@ -336,7 +336,7 @@ QString Einzelbeitrag::newFileName() const
         if (name.count() > 256)
 		{
             name = QStringLiteral("%1 %3 - %2 - %4").arg(ui->titelnummerSpinBox->value(), 2, 10, QLatin1Char('0')).arg(nameLineEdit).arg(beitragsart)
-						.arg(ui->bibelstelleLineEdit->text()).simplified();
+                        .arg(Einzelbeitrag::correctForbiddenChars(ui->bibelstelleLineEdit->text())).simplified();
             if (name.endsWith(" -"))
             {
                 name.chop(2);
